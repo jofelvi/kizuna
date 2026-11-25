@@ -1,0 +1,15 @@
+---
+/** Flecha de trazo, mismo peso visual que el resto de los íconos. Decorativa. */
+interface Props {
+  direction?: 'left' | 'right';
+}
+const { direction = 'right' } = Astro.props;
+---
+
+<svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style={direction === 'left' ? 'transform: scaleX(-1)' : undefined}>
+  <path d="M4 12h15M13 6l6 6-6 6" />
+</svg>
+
+<style>
+  .arrow-icon { width: 1.05em; height: 1.05em; vertical-align: -0.16em; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+</style>

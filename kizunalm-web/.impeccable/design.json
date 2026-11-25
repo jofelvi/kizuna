@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-08T12:00:00Z",
+  "title": "Design System: KIZUNALM",
+  "extensions": {
+    "colorMeta": {
+      "tape": { "role": "primary", "displayName": "Violeta Cinta", "canonical": "#5B2DBE", "tonalRamp": ["#1E0B45", "#2F1470", "#46209A", "#5B2DBE", "#7A55D4", "#9C82E2", "#C4B4EF", "#F1EBFF"] },
+      "tape-deep": { "role": "primary", "displayName": "Violeta Cinta Profunda", "canonical": "#46209A", "tonalRamp": ["#1A0940", "#2A1266", "#3A1A84", "#46209A", "#6340B8", "#8A6DD0", "#B9A8E8", "#ECE5FC"] },
+      "tape-ink": { "role": "primary", "displayName": "Lila Impreso", "canonical": "#F1EBFF", "tonalRamp": ["#2A1F45", "#4A3C72", "#6D5E99", "#9384BD", "#B7AAD9", "#D4CBEC", "#E6DFF8", "#F1EBFF"] },
+      "stamp": { "role": "primary", "displayName": "Tinta de Timbre", "canonical": "#5B2DBE", "tonalRamp": ["#1E0B45", "#2F1470", "#46209A", "#5B2DBE", "#7A55D4", "#9C82E2", "#C4B4EF", "#F1EBFF"] },
+      "alert": { "role": "tertiary", "displayName": "Rojo Rechazo", "canonical": "#B3261E", "tonalRamp": ["#3D0C09", "#601410", "#8A1D17", "#B3261E", "#D14C42", "#E57F76", "#F2B6B0", "#FBE6E4"] },
+      "kraft": { "role": "neutral", "displayName": "Cartón Kraft", "canonical": "#B98B5A", "tonalRamp": ["#2B1B0C", "#5A3E22", "#8F6640", "#A47A4E", "#B98B5A", "#CDA77E", "#E1C8A8", "#F3E8D9"] },
+      "kraft-deep": { "role": "neutral", "displayName": "Kraft en Sombra", "canonical": "#8F6640" },
+      "kraft-shade": { "role": "neutral", "displayName": "Kraft Medio", "canonical": "#A47A4E" },
+      "kraft-ink": { "role": "neutral", "displayName": "Tinta Café", "canonical": "#2B1B0C" },
+      "label": { "role": "neutral", "displayName": "Papel Térmico", "canonical": "#F7F6F2", "tonalRamp": ["#141414", "#48463F", "#6E6A60", "#A39E93", "#CFCAC0", "#E9E6DE", "#F7F6F2", "#FFFFFF"] },
+      "label-shade": { "role": "neutral", "displayName": "Papel Térmico en Reposo", "canonical": "#E9E6DE" },
+      "ink": { "role": "neutral", "displayName": "Tinta Térmica", "canonical": "#141414" },
+      "ink-2": { "role": "neutral", "displayName": "Tinta al 75 %", "canonical": "#48463F" },
+      "ink-3": { "role": "neutral", "displayName": "Tinta al 55 %", "canonical": "#6E6A60" },
+      "rule": { "role": "neutral", "displayName": "Filete Perforado", "canonical": "#CFCAC0" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Títulos de sección impresos directo sobre el kraft (wdth 72)." },
+      "headline": { "displayName": "Headline", "purpose": "Titular de la etiqueta de despacho del hero, checkout y resultado." },
+      "title": { "displayName": "Title", "purpose": "Pasos del seguimiento y nombres de plan; el plan crece 8px por escalón de caja." },
+      "body": { "displayName": "Body", "purpose": "Texto corrido a 17px, wdth 100." },
+      "label": { "displayName": "Label", "purpose": "Rótulo de campo de una etiqueta, en mayúsculas, siempre pegado a su valor." },
+      "data": { "displayName": "Data", "purpose": "Martian Mono solo para precios, abonos, códigos y estados." },
+      "kanji": { "displayName": "Kanji", "purpose": "Shippori Mincho restringida a U+7D46 (絆) en timbre y logo." }
+    },
+    "shadows": [
+      { "name": "shadow-label", "value": "0 1px 1px rgb(58 36 14 / 0.28), 0 10px 24px -10px rgb(58 36 14 / 0.55)", "purpose": "Toda etiqueta térmica en reposo sobre el kraft." },
+      { "name": "shadow-label-lift", "value": "0 2px 2px rgb(58 36 14 / 0.25), 0 22px 40px -16px rgb(58 36 14 / 0.6)", "purpose": "Etiqueta de plan al hover o con foco interno." },
+      { "name": "button-hover", "value": "0 10px 18px -10px rgb(20 20 20 / 0.6)", "purpose": "Botón levantado 1px al hover." },
+      { "name": "tape", "value": "0 6px 14px -8px rgb(30 10 60 / 0.7)", "purpose": "Solo la cinta de embalaje." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Curva única de todo el sistema." },
+      { "name": "unroll", "value": "1100ms ease-out 120ms, clip-path de 0 a polígono completo", "purpose": "La cinta se desenrolla una vez al cargar." },
+      { "name": "thunk", "value": "520ms ease-out, scale 1.35 -> 0.97 -> 1 con blur 3px -> 0", "purpose": "El timbre cae una vez (hero 900ms de retraso, resultado 200ms)." },
+      { "name": "settle", "value": "900ms ease-out, translateY 18px y giro -3deg a -1.2deg", "purpose": "La etiqueta de despacho se asienta al cargar." },
+      { "name": "route", "value": "animation-timeline: view(); range entry 30% cover 55%", "purpose": "La ruta del seguimiento avanza con el scroll y rellena los puntos." },
+      { "name": "button", "value": "transform y box-shadow 220ms ease-out; background 160ms", "purpose": "Estados de botón." },
+      { "name": "reduced-motion", "value": "@media (prefers-reduced-motion: no-preference)", "purpose": "Toda animación vive dentro de esta condición; scroll suave también se desactiva." }
+    ],
+    "breakpoints": [
+      { "name": "plans-stack", "value": "1020px" },
+      { "name": "hero-stack", "value": "900px" },
+      { "name": "nav-compact", "value": "820px" },
+      { "name": "table-stack", "value": "640px" },
+      { "name": "narrow", "value": "560px" }
+    ],
+    "textures": [
+      { "name": "kraft-fibers", "value": "SVG feTurbulence fractalNoise baseFrequency 0.025 0.75, 3 octavas, 400px", "purpose": "Fibra horizontal del cartón." },
+      { "name": "kraft-flute", "value": "repeating-linear-gradient(180deg, rgb(70 42 14 / 0.05) 0 3px, rgb(255 236 205 / 0.04) 3px 5px, transparent 5px 9px)", "purpose": "Onda del corrugado bajo el papel." },
+      { "name": "kraft-mottle", "value": "SVG feTurbulence baseFrequency 0.0025, 1400px", "purpose": "Manchas amplias del cartón." },
+      { "name": "ink-grain", "value": "SVG feTurbulence baseFrequency 0.9 como máscara de 160px", "purpose": "Grano de tinta de los timbres." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón Cinta",
+      "kind": "button",
+      "refersTo": "button-tape",
+      "description": "Acción principal de un bloque: reservar, ver planes, pagar.",
+      "html": "<a class=\"ds-btn ds-btn-tape\" href=\"#\">Reservar con abono</a>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 24px; font-family: var(--font-label); font-size: 17px; font-weight: 700; font-variation-settings: \"wdth\" 88; color: var(--tape-ink); background: var(--tape); border: 2px solid var(--tape); border-radius: 4px; text-decoration: none; cursor: pointer; transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out), background-color 160ms; } .ds-btn-tape:hover { background: var(--tape-deep); border-color: var(--tape-deep); transform: translateY(-1px); box-shadow: 0 10px 18px -10px rgb(20 20 20 / 0.6); } .ds-btn:active { transform: translateY(0); box-shadow: none; } .ds-btn:focus-visible { outline: 3px solid var(--tape); outline-offset: 3px; }"
+    },
+    {
+      "name": "Botón Tinta",
+      "kind": "button",
+      "refersTo": "button-ink",
+      "description": "Botón base en tinta térmica.",
+      "html": "<button class=\"ds-btn-ink\">Continuar</button>",
+      "css": ".ds-btn-ink { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 24px; font-family: var(--font-label); font-size: 17px; font-weight: 700; font-variation-settings: \"wdth\" 88; color: var(--label); background: var(--ink); border: 2px solid var(--ink); border-radius: 4px; cursor: pointer; transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out); } .ds-btn-ink:hover { transform: translateY(-1px); box-shadow: 0 10px 18px -10px rgb(20 20 20 / 0.6); } .ds-btn-ink:active { transform: none; box-shadow: none; } .ds-btn-ink:focus-visible { outline: 3px solid var(--tape); outline-offset: 3px; }"
+    },
+    {
+      "name": "Botón Fantasma",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Acción secundaria, típicamente WhatsApp.",
+      "html": "<a class=\"ds-btn-ghost\" href=\"#\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" aria-hidden=\"true\"><path d=\"M4 12h15M13 6l6 6-6 6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Escribir por WhatsApp</a>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 24px; font-family: var(--font-label); font-size: 17px; font-weight: 700; font-variation-settings: \"wdth\" 88; color: var(--ink); background: transparent; border: 2px solid var(--ink); border-radius: 4px; text-decoration: none; transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out), background-color 160ms; } .ds-btn-ghost:hover { background: rgb(20 20 20 / 0.06); transform: translateY(-1px); box-shadow: 0 10px 18px -10px rgb(20 20 20 / 0.6); } .ds-btn-ghost:focus-visible { outline: 3px solid var(--tape); outline-offset: 3px; }"
+    },
+    {
+      "name": "Etiqueta térmica",
+      "kind": "card",
+      "refersTo": "label-card",
+      "description": "Contenedor universal: papel térmico con campos, perforación y código.",
+      "html": "<article class=\"ds-label\"><header class=\"ds-label-head\"><div class=\"ds-field\"><span>Formato</span><strong>Paquete</strong></div><span class=\"ds-code\">KZ-02</span></header><hr class=\"ds-perf\"><div class=\"ds-label-body\"><h3>Web completa</h3><p class=\"ds-price\">$390.000</p></div></article>",
+      "css": ".ds-label { background: var(--label); color: var(--ink); border-radius: 12px; box-shadow: var(--shadow-label); overflow: hidden; transform: rotate(-0.8deg); transition: transform 320ms var(--ease-out), box-shadow 320ms var(--ease-out); font-family: var(--font-label); } .ds-label:hover, .ds-label:focus-within { transform: rotate(0) translateY(-4px); box-shadow: var(--shadow-label-lift); } .ds-label-head { display: flex; justify-content: space-between; padding: 16px 22px; } .ds-field { display: grid; gap: 2px; } .ds-field span { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); } .ds-code { font-family: var(--font-data); font-size: 12px; letter-spacing: 0.14em; color: var(--ink-2); } .ds-perf { height: 0; border: 0; border-top: 2px dashed var(--rule); margin: 0; } .ds-label-body { padding: 20px 22px; display: grid; gap: 12px; } .ds-label-body h3 { margin: 0; font-size: 36px; font-weight: 800; font-variation-settings: \"wdth\" 72; line-height: 0.98; } .ds-price { margin: 0; font-family: var(--font-data); font-variant-numeric: tabular-nums; font-size: 44px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "Campo del formulario de pago dentro de una etiqueta.",
+      "html": "<label class=\"ds-input-wrap\"><span>Correo</span><input class=\"ds-input\" type=\"email\" placeholder=\"tu@correo.cl\"></label>",
+      "css": ".ds-input-wrap { display: grid; gap: 6px; font-family: var(--font-label); } .ds-input-wrap > span { font-size: 14px; font-weight: 700; color: var(--ink); } .ds-input { font: inherit; font-size: 17px; color: var(--ink); background: #fff; border: 2px solid var(--rule); border-radius: 4px; min-height: 50px; padding: 0 14px; transition: border-color 160ms; } .ds-input::placeholder { color: var(--ink-3); } .ds-input:hover { border-color: var(--ink-3); } .ds-input:focus-visible { outline: 3px solid var(--tape); outline-offset: 1px; border-color: var(--ink); } .ds-input[aria-invalid=\"true\"] { border-color: var(--alert); }"
+    },
+    {
+      "name": "Navegación",
+      "kind": "nav",
+      "description": "Barra fija de papel térmico translúcido con perforación inferior.",
+      "html": "<header class=\"ds-nav\"><span class=\"ds-nav-brand\">KIZUNALM</span><ul class=\"ds-nav-menu\"><li><a href=\"#\">Servicios</a></li><li><a href=\"#\">Planes</a></li><li><a href=\"#\">Proceso</a></li></ul></header>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 24px; min-height: 68px; padding: 0 24px; color: var(--ink); background: rgb(247 246 242 / 0.92); backdrop-filter: saturate(1.2) blur(10px); border-bottom: 2px dashed var(--rule); font-family: var(--font-label); } .ds-nav-brand { font-weight: 800; font-variation-settings: \"wdth\" 72; font-size: 22px; } .ds-nav-menu { display: flex; gap: 4px; list-style: none; margin: 0 0 0 auto; padding: 0; } .ds-nav-menu a { display: block; padding: 8px 12px; border-radius: 4px; font-weight: 600; font-size: 16px; text-decoration: none; color: var(--ink-2); transition: color 160ms, background-color 160ms; } .ds-nav-menu a:hover { color: var(--ink); background: rgb(20 20 20 / 0.06); } .ds-nav-menu a:focus-visible { outline: 3px solid var(--tape); outline-offset: 3px; }"
+    },
+    {
+      "name": "Cinta",
+      "kind": "custom",
+      "refersTo": "tape-strip",
+      "description": "Cinta de embalaje violeta con la marca impresa en repetición. Decorativa.",
+      "html": "<div class=\"ds-tape\" aria-hidden=\"true\"><span>KIZUNALM · 絆 · DESPACHO CON CUIDADO · KIZUNALM · 絆 · DESPACHO CON CUIDADO ·</span></div>",
+      "css": ".ds-tape { height: 54px; overflow: hidden; display: flex; align-items: center; color: var(--tape-ink); background: linear-gradient(180deg, rgb(255 255 255 / 0.22) 0 2px, transparent 2px calc(100% - 2px), rgb(0 0 0 / 0.18) calc(100% - 2px)), linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.14) 45%, transparent 60%), var(--tape); box-shadow: 0 6px 14px -8px rgb(30 10 60 / 0.7); clip-path: polygon(0.6% 0, 100% 0, 99.4% 100%, 0 100%); transform: rotate(-2.2deg); } .ds-tape span { white-space: nowrap; font-family: var(--font-label); font-weight: 800; font-variation-settings: \"wdth\" 80; font-size: 15px; letter-spacing: 0.24em; opacity: 0.92; padding-left: 24px; }"
+    },
+    {
+      "name": "Timbre",
+      "kind": "custom",
+      "refersTo": "stamp",
+      "description": "Sello de goma violeta con grano de tinta: 絆 o una palabra de estado.",
+      "html": "<span class=\"ds-stamp\" aria-hidden=\"true\">ELEGIDO</span>",
+      "css": ".ds-stamp { display: inline-grid; place-items: center; color: var(--stamp); border: 0.08em solid currentColor; border-radius: 0.14em; -webkit-mask-image: var(--ink-grain); mask-image: var(--ink-grain); -webkit-mask-size: 160px; mask-size: 160px; line-height: 1; font-family: var(--font-label); font-weight: 800; font-variation-settings: \"wdth\" 75; font-size: 22px; letter-spacing: 0.12em; padding: 6px 12px; transform: rotate(-7deg); }"
+    },
+    {
+      "name": "Código de barras",
+      "kind": "custom",
+      "description": "Code 128B real en SVG con el valor impreso debajo en mono.",
+      "html": "<figure class=\"ds-barcode\" aria-hidden=\"true\"><svg viewBox=\"0 0 60 40\" preserveAspectRatio=\"none\"><rect x=\"0\" width=\"2\" height=\"40\"/><rect x=\"3\" width=\"1\" height=\"40\"/><rect x=\"6\" width=\"3\" height=\"40\"/><rect x=\"11\" width=\"1\" height=\"40\"/><rect x=\"14\" width=\"2\" height=\"40\"/><rect x=\"18\" width=\"1\" height=\"40\"/><rect x=\"21\" width=\"4\" height=\"40\"/><rect x=\"27\" width=\"1\" height=\"40\"/><rect x=\"30\" width=\"2\" height=\"40\"/><rect x=\"34\" width=\"3\" height=\"40\"/><rect x=\"39\" width=\"1\" height=\"40\"/><rect x=\"42\" width=\"2\" height=\"40\"/><rect x=\"46\" width=\"1\" height=\"40\"/><rect x=\"49\" width=\"3\" height=\"40\"/><rect x=\"54\" width=\"1\" height=\"40\"/><rect x=\"57\" width=\"3\" height=\"40\"/></svg><figcaption>KZ-0001-CL</figcaption></figure>",
+      "css": ".ds-barcode { margin: 0; display: grid; gap: 4px; max-width: 220px; } .ds-barcode svg { display: block; width: 100%; height: 56px; fill: var(--ink); shape-rendering: crispEdges; } .ds-barcode figcaption { font-family: var(--font-data); font-size: 12px; letter-spacing: 0.32em; text-align: center; color: var(--ink); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La Encomienda",
+    "overview": "Todo el sitio es una caja de despacho sobre la mesa: el fondo es cartón kraft corrugado, la información viaja impresa en etiquetas térmicas blancas, la marca es una cinta de embalaje violeta y el vínculo (絆) es un timbre de goma. El mundo no ilustra una agencia; muestra un paquete preparado con cuidado que llega bien. Cada pieza tiene un equivalente físico, y lo que no lo tiene no entra.\n\nEl kraft es procedural: fibra horizontal con `feTurbulence` alargado, la onda del corrugado como gradiente repetido y una mancha amplia de baja frecuencia, sin ninguna imagen raster. Sobre ese fondo las etiquetas se apoyan ligeramente giradas (entre -1.2° y 0.5°), con sombra cálida, y se enderezan al pasar el cursor. Una sola tinta térmica imprime todo el texto de las etiquetas; el violeta queda reservado para la cinta, el timbre y la acción principal.\n\nLa densidad es de documento logístico: campos con rótulo, filetes perforados, códigos de barras Code 128B reales, precios en mono de impresora. El mundo es solo claro; no existe modo oscuro.",
+    "keyCharacteristics": [
+      "Fondo kraft procedural (fibra, corrugado, mancha) sin raster.",
+      "Etiqueta térmica como contenedor universal: papel claro, esquina troquelada de 12px, sombra cálida.",
+      "Una tinta negra para el texto impreso; violeta solo en cinta, timbre, CTA y foco.",
+      "Grotesca condensada por eje `wdth`: 72 en titulares, 100 en texto.",
+      "Mono solo para precios, códigos y estados; mincho solo para 絆.",
+      "Movimiento físico y único: la cinta se desenrolla, el timbre cae, la etiqueta se asienta; todo detrás de `prefers-reduced-motion`."
+    ],
+    "rules": [
+      { "name": "The One Ink Rule", "body": "Todo lo impreso en una etiqueta usa `ink` o sus pesos `ink-2` / `ink-3`. Ningún otro color de texto entra en el papel térmico, salvo el violeta de estado de ruta y el rojo de rechazo.", "section": "colors" },
+      { "name": "The Tape Is the Brand Rule", "body": "El violeta aparece como material (cinta, timbre) o como la única acción principal de un bloque. Nunca como degradado de fondo ni como relleno de tarjetas.", "section": "colors" },
+      { "name": "The Alert Is Only Rejection Rule", "body": "`alert` existe para errores y pagos no aprobados. No se usa como acento ni para \"ofertas\".", "section": "colors" },
+      { "name": "The Width Axis Rule", "body": "La jerarquía se construye con el eje `wdth` (72 titulares, 88 botones, 100 texto) y el peso, no agregando familias.", "section": "typography" },
+      { "name": "The Mono Is Data Rule", "body": "Martian Mono solo para precios, códigos y estados. Nunca para titulares ni texto corrido.", "section": "typography" },
+      { "name": "The One Kanji Rule", "body": "Shippori Mincho solo dibuja 絆; el archivo está restringido a U+7D46 y no sirve para nada más.", "section": "typography" },
+      { "name": "The Warm Shadow Rule", "body": "Las sombras sobre el kraft son café (`rgb(58 36 14)`), porque el cartón tiñe la luz. Una sombra gris o negra pura sobre el kraft rompe el material.", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** poner todo contenido legible dentro de una etiqueta térmica (`label`, 12px, sombra cálida), y dejar sobre el kraft solo titulares de sección, bajadas y notas en `kraft-ink`.",
+      "**Do** separar franjas de una etiqueta con perforación discontinua de 2px en `rule`.",
+      "**Do** escribir precios, abonos y códigos en Martian Mono con cifras tabulares.",
+      "**Do** girar etiquetas y timbres levemente (etiquetas entre -1.2° y 0.5°, timbres entre -6° y -8°) y enderezarlas en móvil o al interactuar.",
+      "**Do** envolver toda animación en `prefers-reduced-motion: no-preference`; el movimiento es uno por pieza y ocurre una vez (desenrollar, timbrar, asentar) o lo conduce el scroll.",
+      "**Do** generar texturas de forma procedural (SVG `feTurbulence`, gradientes) en vez de imágenes.",
+      "**Do** usar el vocabulario del producto en la interfaz: plan, abono, precio final, conversación inicial, rondas de revisión, días hábiles; y tratar siempre de tú."
+    ],
+    "donts": [
+      "**Don't** usar degradados violetas de fondo, mockups de celular ni filas de tres tarjetas iguales; los planes difieren en tamaño como cajas distintas.",
+      "**Don't** agregar un modo oscuro ni invertir el kraft; el mundo es solo claro.",
+      "**Don't** usar Shippori Mincho para otro carácter que 絆, ni Martian Mono para titulares.",
+      "**Don't** poner rótulos en mayúsculas sobre los titulares de sección; el rótulo de 11px existe solo como etiqueta de un campo con su valor.",
+      "**Don't** usar sombras grises o negras duras sobre el kraft, ni sombras desplazadas sin desenfoque.",
+      "**Don't** usar `alert` fuera de errores y pagos no aprobados.",
+      "**Don't** usar colores crudos fuera de los tokens de `:root`."
+    ]
+  }
+}

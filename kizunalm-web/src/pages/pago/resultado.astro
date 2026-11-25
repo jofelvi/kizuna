@@ -1,0 +1,124 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Barcode from '../../components/Barcode.astro';
+import WhatsAppIcon from '../../components/icons/WhatsAppIcon.astro';
+import { contact } from '../../data/site';
+import { findPlanByCode, formatCLP } from '../../lib/checkout';
+import { commitWebpayTransaction, isApproved, type WebpayCommit } from '../../lib/webpay';
+
+export const prerender = false;
+
+/**
+ * Webpay vuelve aquí (GET o POST según el caso):
+ *  - token_ws solo           → flujo normal: confirmamos (commit) y vemos si se aprobó.
+ *  - TBK_TOKEN sin token_ws  → la persona anuló el pago en el formulario de Webpay.
+ *  - TBK_TOKEN + token_ws    → error o tiempo agotado en el formulario.
+ */
+async function readParams(request: Request, url: URL): Promise<URLSearchParams> {
+  if (request.method !== 'POST') return url.searchParams;
+  const form = await request.formData();
+  const params = new URLSearchParams();
+  form.forEach((value, key) => params.set(key, String(value)));
+  return params;
+}
+
+const params = await readParams(Astro.request, Astro.url);
+const tokenWs = params.get('token_ws');
+const tbkToken = params.get('TBK_TOKEN');
+
+type Outcome =
+  | { kind: 'approved'; result: WebpayCommit }
+  | { kind: 'rejected'; result: WebpayCommit }
+  | { kind: 'aborted' }
+  | { kind: 'error' };
+
+let outcome: Outcome = { kind: 'error' };
+if (tokenWs && !tbkToken) {
+  try {
+    const result = await commitWebpayTransaction(tokenWs);
+    outcome = isApproved(result) ? { kind: 'approved', result } : { kind: 'rejected', result };
+  } catch (error: unknown) {
+    console.error('[webpay:commit]', error);
+    outcome = { kind: 'error' };
+  }
+} else if (tbkToken && !tokenWs) {
+  outcome = { kind: 'aborted' };
+}
+
+const order = 'result' in outcome ? outcome.result.buy_order : '';
+const plan = order ? findPlanByCode(order.split('-')[1] ?? '') : undefined;
+
+const copy = {
+  approved: { stamp: 'PAGADO', title: 'Abono recibido. Tu proyecto quedó reservado.', text: 'Te contacto para agendar la primera reunión. Si quieres adelantar, escríbeme por WhatsApp con tu número de orden.' },
+  rejected: { stamp: 'RECHAZADO', title: 'El banco no aprobó el pago', text: 'No se hizo ningún cobro. Puedes intentar con otra tarjeta o escribirme por WhatsApp y lo resolvemos.' },
+  aborted: { stamp: 'ANULADO', title: 'Anulaste el pago', text: 'No se hizo ningún cobro. Tu plan sigue disponible cuando quieras retomarlo.' },
+  error: { stamp: 'SIN CONFIRMAR', title: 'No pudimos confirmar el pago', text: 'Si ves un cargo en tu tarjeta, escríbeme con la hora del pago y lo revisamos. Si no, no se hizo ningún cobro.' },
+}[outcome.kind];
+
+const whatsappText = order ? `Hola, hice el pago del abono. Mi orden es ${order}.` : 'Hola, tuve un problema al pagar el abono.';
+const whatsappHref = `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
+const retryHref = plan ? `/pago/${plan.id}` : '/#planes';
+const isPositive = outcome.kind === 'approved';
+---
+
+<Layout title={`${copy.stamp} · KIZUNALM`} description="Resultado del pago del abono." noindex>
+  <Nav />
+  <main class="page result">
+    <article class="label receipt" aria-labelledby="result-title">
+      <span class:list={['stamp', 'result-stamp', { negative: !isPositive }]} aria-hidden="true">{copy.stamp}</span>
+      <h1 id="result-title">{copy.title}</h1>
+      <p class="text">{copy.text}</p>
+
+      {
+        'result' in outcome && (
+          <dl class="detail">
+            <div><dt>Orden</dt><dd class="data">{outcome.result.buy_order}</dd></div>
+            {plan && <div><dt>Plan</dt><dd>{plan.name}</dd></div>}
+            <div><dt>Monto</dt><dd class="data">{formatCLP(outcome.result.amount)}</dd></div>
+            {outcome.result.card_detail?.card_number && <div><dt>Tarjeta</dt><dd class="data">•••• {outcome.result.card_detail.card_number}</dd></div>}
+            {outcome.result.authorization_code && <div><dt>Código de autorización</dt><dd class="data">{outcome.result.authorization_code}</dd></div>}
+            <div><dt>Fecha</dt><dd class="data">{new Date(outcome.result.transaction_date).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Santiago' })}</dd></div>
+          </dl>
+        )
+      }
+
+      <div class="actions">
+        {isPositive ? (
+          <a class="btn btn-tape" href={whatsappHref} target="_blank" rel="noopener noreferrer"><WhatsAppIcon />Avisar por WhatsApp</a>
+        ) : (
+          <a class="btn btn-tape" href={retryHref}>Intentar de nuevo</a>
+        )}
+        {isPositive ? (
+          <a class="btn btn-ghost" href="/">Volver al inicio</a>
+        ) : (
+          <a class="btn btn-ghost" href={whatsappHref} target="_blank" rel="noopener noreferrer"><WhatsAppIcon />Escribir por WhatsApp</a>
+        )}
+      </div>
+      {order && <Barcode value={order} class="receipt-code" />}
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .result { min-height: calc(100vh - var(--nav-height)); display: grid; place-items: center; padding-block: 48px 96px; }
+  .receipt { position: relative; width: min(620px, 100%); padding: clamp(28px, 4vw, 48px); display: grid; gap: 18px; transform: rotate(-0.6deg); }
+  .result-stamp {
+    --stamp-rotate: -6deg;
+    justify-self: start;
+    padding: 8px 16px; font-weight: 800; font-variation-settings: "wdth" 72; font-size: clamp(28px, 4vw, 40px); letter-spacing: 0.1em;
+    transform: rotate(-6deg);
+  }
+  .result-stamp.negative { color: var(--alert); }
+  @media (prefers-reduced-motion: no-preference) {
+    .result-stamp { animation: stamp-thunk 520ms var(--ease-out) 200ms backwards; }
+  }
+  h1 { font-size: clamp(36px, 5vw, 56px); }
+  .text { color: var(--ink-2); font-size: 18px; max-width: 48ch; }
+  .detail { margin: 0; padding: 16px 0; border-block: 2px dashed var(--rule); display: grid; gap: 8px; }
+  .detail div { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .detail dt { font-weight: 600; color: var(--ink-2); }
+  .detail dd { margin: 0; font-weight: 600; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .receipt :global(.receipt-code) { --barcode-height: 48px; max-width: 320px; }
+</style>

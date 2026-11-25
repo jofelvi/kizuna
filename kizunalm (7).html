@@ -1,0 +1,571 @@
+<title>KIZUNALM</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Shippori+Mincho:wght@500;700&display=swap">
+<style>
+/* Layout: menú fijo arriba, cuatro secciones en una sola página; cada sección usa grillas (cuadros de valor, valores, servicios, contacto). */
+:root {
+  --bg: #F4F0FA;
+  --surface: #FFFFFF;
+  --fg: #2A2340;
+  --muted: #62597C;
+  --line: #DDD5EE;
+  --thread: #6B48A6;
+  --on-thread: #FFFFFF;
+  --leaf: #4A8B80;
+  --bar-bg: #0D0B14;
+  --bar-fg: #FFFFFF;
+  --bar-muted: #BDB6D0;
+  --bar-line: #2B2640;
+  --font-display: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", Georgia, serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17132A; --surface: #211B38; --fg: #EFEBFA; --muted: #B3ABCC; --line: #3A3260; --thread: #B79CF0; --on-thread: #17132A; --leaf: #7FC4B8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17132A; --surface: #211B38; --fg: #EFEBFA; --muted: #B3ABCC; --line: #3A3260; --thread: #B79CF0; --on-thread: #17132A; --leaf: #7FC4B8;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  padding-block: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bar-bg); }
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1.15; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--thread); outline-offset: 3px; border-radius: 4px; }
+.eyebrow { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+/* Menú */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; background: var(--bar-bg); color: var(--bar-fg); box-shadow: 0 0 0 100vmax var(--bar-bg); clip-path: inset(0 -100vmax); }
+.nav :focus-visible, footer :focus-visible { outline-color: var(--bar-fg); }
+.nav-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 64px; }
+.brand { display: inline-flex; align-items: center; gap: 12px; font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: 0.08em; text-decoration: none; }
+.mark { flex: none; width: 36px; height: 36px; background: var(--thread); color: var(--on-thread); display: grid; place-items: center; border-radius: 6px; transform: rotate(-4deg); font-family: var(--font-display); font-size: 24px; font-weight: 700; line-height: 1; letter-spacing: 0; }
+.menu { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; align-items: center; }
+.menu a { display: block; text-decoration: none; font-weight: 500; font-size: 16px; padding: 8px 14px; border-radius: 6px; }
+.menu a:hover { background: var(--bar-line); }
+.menu a.cta { background: #7C5BBE; color: #FFFFFF; font-weight: 600; }
+.menu a.cta:hover { background: #7C5BBE; }
+.menu a.cta:hover { filter: brightness(1.1); }
+.burger { display: none; background: transparent; color: var(--fg); border: 1px solid var(--line); border-radius: 6px; font: inherit; font-weight: 600; font-size: 15px; padding: 8px 14px; cursor: pointer; }
+
+section { padding-block: 72px; scroll-margin-top: calc(64px + env(safe-area-inset-top, 0px)); }
+.sec-head { display: grid; gap: 10px; margin-bottom: 32px; max-width: 62ch; }
+.sec-head h2 { font-size: clamp(28px, 4vw, 42px); }
+.sec-head p { color: var(--muted); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; background: var(--thread); color: var(--on-thread); font-family: var(--font-body); font-weight: 600; font-size: 17px; text-decoration: none; padding: 14px 24px; border-radius: 6px; border: 0; cursor: pointer; }
+.btn:hover { filter: brightness(1.08); }
+.link-quiet { font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--line); padding-bottom: 2px; }
+.link-quiet:hover { border-color: var(--thread); }
+
+/* Inicio */
+#inicio { padding-top: 56px; }
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px 56px; align-items: center; }
+.hero h1 { font-size: clamp(34px, 6vw, 60px); margin-block: 16px 20px; }
+.hero .lead { font-size: 19px; color: var(--muted); max-width: 54ch; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin-top: 28px; }
+.seal-wrap { display: grid; justify-items: center; gap: 12px; }
+.seal { width: 148px; height: 148px; background: var(--thread); color: var(--on-thread); display: grid; place-items: center; border-radius: 10px; transform: rotate(-4deg); font-family: var(--font-display); font-size: 96px; font-weight: 700; line-height: 1; }
+.seal-caption { font-size: 13px; color: var(--muted); text-align: center; max-width: 18ch; line-height: 1.4; }
+.thread { display: block; width: 100%; height: 40px; margin-block: 36px 0; overflow: visible; }
+.thread path { fill: none; stroke: var(--thread); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 1400; stroke-dashoffset: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .thread path { animation: draw 1.6s ease-out 1; }
+  @keyframes draw { from { stroke-dashoffset: 1400; } to { stroke-dashoffset: 0; } }
+}
+.highlights { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 36px; border-top: 1px solid var(--line); }
+.hl { padding: 24px 24px 8px 0; display: grid; gap: 8px; align-content: start; }
+.hl + .hl { padding-left: 24px; border-left: 1px solid var(--line); }
+.hl strong { font-family: var(--font-display); font-size: 40px; line-height: 1; color: var(--thread); }
+.hl h3 { font-size: 20px; }
+.hl p { color: var(--muted); font-size: 15px; }
+
+/* Nosotros */
+.about { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 32px 56px; align-items: start; }
+.about .body { display: grid; gap: 16px; font-size: 18px; }
+.about .body p { max-width: 58ch; }
+.about .quote { font-family: var(--font-display); font-size: clamp(22px, 3vw, 28px); line-height: 1.35; font-weight: 500; max-width: 30ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.fact { border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 15px; font-weight: 500; background: var(--surface); }
+.values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.val { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 22px; display: grid; gap: 6px; align-content: start; }
+.val h3 { font-size: 20px; }
+.val p { color: var(--muted); font-size: 15px; }
+.val .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--leaf); }
+
+/* Servicios */
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.svc { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 20px 28px; display: flex; flex-direction: column; gap: 16px; }
+.svc > div, .svc > .more { padding-inline: 8px; }
+.svc ul, .svc .ideal { margin-inline: 8px; }
+.shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.shot { aspect-ratio: 4 / 3; border-radius: 8px; overflow: hidden; background: var(--bg); border: 1px solid var(--line); }
+.shot svg { display: block; width: 100%; height: 100%; }
+.sv-bg { fill: var(--bg); } .sv-card { fill: var(--surface); stroke: var(--line); stroke-width: 2; }
+.sv-acc { fill: var(--thread); } .sv-leaf { fill: var(--leaf); } .sv-ink { fill: var(--fg); } .sv-line { fill: var(--line); }
+.sv-on { fill: var(--on-thread); } .sv-stroke-acc { fill: none; stroke: var(--thread); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.sv-stroke-on { fill: none; stroke: var(--on-thread); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.sv-stroke-ink { fill: none; stroke: var(--fg); stroke-width: 3; }
+.svc .ideal { font-size: 15px; color: var(--muted); border-left: 3px solid var(--leaf); padding-left: 12px; }
+.svc .more { margin-top: auto; }
+.svc .more a { font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--thread); padding-bottom: 2px; }
+.svc h3 { font-size: 24px; }
+.svc .what { color: var(--muted); font-size: 16px; margin-top: 8px; }
+.svc ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; align-content: start; font-size: 16px; }
+.svc li { position: relative; padding-left: 22px; }
+.svc li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 12px; height: 2px; background: var(--leaf); }
+.price { display: grid; gap: 4px; justify-items: start; border-top: 1px solid var(--line); padding-top: 16px; }
+.price small { font-size: 13px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+.price strong { font-family: var(--font-display); font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.price .extra { font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.price a { margin-top: 12px; font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--thread); padding-bottom: 2px; }
+.note { margin-top: 24px; font-size: 15px; color: var(--muted); max-width: 70ch; }
+
+/* Contacto */
+.contact { background: var(--fg); color: var(--bg); border-radius: 12px; padding: clamp(24px, 5vw, 56px); display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 32px 48px; align-items: start; }
+.contact h2 { font-size: clamp(28px, 4vw, 42px); }
+.contact .intro { margin-top: 12px; opacity: 0.85; max-width: 46ch; }
+.contact-data { display: grid; gap: 14px; margin-top: 24px; font-size: 16px; }
+.contact-data div { display: grid; gap: 2px; }
+.contact-data small { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; font-weight: 600; }
+.contact-data b { font-weight: 600; font-size: 18px; user-select: all; overflow-wrap: anywhere; }
+.copy { justify-self: start; margin-top: 4px; background: transparent; color: inherit; border: 1px solid currentColor; border-radius: 4px; font: inherit; font-size: 13px; padding: 2px 10px; cursor: pointer; opacity: 0.85; }
+.copy:hover { opacity: 1; }
+.form { display: grid; gap: 14px; }
+.form label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+.form input, .form select, .form textarea { font: inherit; font-size: 16px; font-weight: 400; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; width: 100%; min-width: 0; }
+.form textarea { min-height: 96px; resize: vertical; }
+.form .btn { background: var(--bg); color: var(--fg); }
+.form .btn:hover { background: var(--surface); filter: none; }
+.hint { font-size: 14px; min-height: 1.4em; opacity: 0.9; }
+.contact :focus-visible { outline-color: var(--bg); }
+.form input:focus-visible, .form select:focus-visible, .form textarea:focus-visible { outline-color: var(--thread); }
+
+footer { margin-top: 56px; padding-block: 48px 24px; background: var(--bar-bg); color: var(--bar-muted); font-size: 15px; box-shadow: 0 0 0 100vmax var(--bar-bg); clip-path: inset(0 -100vmax); }
+.foot { display: grid; grid-template-columns: minmax(0, 5fr) repeat(3, minmax(0, 3fr)); gap: 32px; }
+.foot h4 { margin: 0 0 12px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--bar-fg); font-weight: 600; }
+.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.foot a { text-decoration: none; }
+.foot a:hover { color: var(--bar-fg); text-decoration: underline; }
+.foot-brand { display: grid; gap: 12px; align-content: start; }
+.foot-brand .brand, footer .brand { color: var(--bar-fg); }
+.foot-brand p { max-width: 32ch; }
+.foot li span.soon { margin-left: 8px; font-size: 12px; border: 1px solid var(--bar-line); border-radius: 999px; padding: 1px 8px; }
+.foot .val-text { overflow-wrap: anywhere; color: var(--bar-fg); }
+.copyright { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--bar-line); font-size: 13px; }
+@media (max-width: 820px) { .foot { grid-template-columns: repeat(2, minmax(0, 1fr)); } .foot-brand { grid-column: 1 / -1; } }
+@media (max-width: 480px) { .foot { grid-template-columns: minmax(0, 1fr); } }
+
+@media (max-width: 920px) {
+  .cards { grid-template-columns: minmax(0, 1fr); }
+  .highlights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hl:nth-child(3) { padding-left: 0; border-left: 0; }
+  .hl:nth-child(n+3) { border-top: 1px solid var(--line); margin-top: 16px; }
+  .about, .contact { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 820px) {
+  .nav-row { flex-wrap: wrap; row-gap: 0; min-height: 0; padding-top: 10px; }
+  .menu { order: 3; width: 100%; justify-content: space-between; gap: 2px; padding: 4px 0 10px; overflow-x: auto; }
+  .menu li { flex: 1 1 auto; }
+  .menu a { text-align: center; padding: 10px 6px; font-size: 15px; }
+  section { scroll-margin-top: calc(112px + env(safe-area-inset-top, 0px)); }
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .seal-wrap { justify-items: start; order: -1; }
+  .seal { width: 96px; height: 96px; font-size: 62px; border-radius: 8px; }
+  .seal-caption { text-align: left; max-width: none; }
+  section { padding-block: 48px; }
+  #inicio { padding-top: 32px; }
+}
+@media (max-width: 520px) {
+  .highlights { grid-template-columns: minmax(0, 1fr); }
+  .hl, .hl + .hl { padding: 20px 0 8px; border-left: 0; }
+  .hl + .hl { border-top: 1px solid var(--line); margin-top: 8px; }
+  .values { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+
+<div class="wrap">
+  <header class="nav">
+    <div class="nav-row" style="position: relative;">
+      <a class="brand" href="#inicio" aria-label="KIZUNALM, ir al inicio"><span class="mark" aria-hidden="true">絆</span><span>KIZUNALM</span></a>
+      <ul class="menu" id="menu">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a class="cta" href="#contacto">Contacto</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <!-- INICIO -->
+    <section id="inicio">
+      <div class="hero">
+        <div>
+          <h1>Tus clientes te escriben. Tú mereces un negocio que responda.</h1>
+          <div style="display: grid; gap: 14px;">
+            <p class="lead">Ayudo a emprendedores y pequeños negocios a tener una presencia digital profesional, organizar su atención al cliente y convertir más conversaciones en ventas.</p>
+            <p class="lead">Diseño páginas web, optimizo tus canales digitales y preparo respuestas y herramientas para que atiendas mejor, ahorres tiempo y hagas crecer tu negocio.</p>
+            <p class="lead" style="color: var(--fg); font-weight: 500;">Soluciones prácticas, cercanas y adaptadas a tu negocio.</p>
+          </div>
+          <div class="cta-row">
+            <a class="btn" data-msg="Hola, vi KIZUNALM y me gustaría cotizar. Mi negocio es: " href="#contacto">Cotizar sin costo</a>
+            <a class="link-quiet" href="#servicios">Ver servicios</a>
+          </div>
+        </div>
+        <div class="seal-wrap">
+          <div class="seal" aria-hidden="true">絆</div>
+          <p class="seal-caption">Kizuna, en japonés: el vínculo entre las personas.</p>
+        </div>
+      </div>
+      <svg class="thread" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 22 C 120 4, 220 38, 350 20 S 580 6, 700 24 S 900 34, 976 20" vector-effect="non-scaling-stroke"/>
+      </svg>
+      <div class="highlights">
+        <div class="hl">
+          <strong>+10</strong>
+          <h3>Años en atención al cliente</h3>
+          <p>Sé qué necesita una persona para comprar y volver.</p>
+        </div>
+        <div class="hl">
+          <strong>Web</strong>
+          <h3>Páginas a tu medida</h3>
+          <p>Simples, rápidas y pensadas para el celular.</p>
+        </div>
+        <div class="hl">
+          <strong>Ml</strong>
+          <h3>Mercado Libre ordenado</h3>
+          <p>Publicaciones claras que se entienden y se encuentran.</p>
+        </div>
+        <div class="hl">
+          <strong>絆</strong>
+          <h3>Compromiso real</h3>
+          <p>Trato cercano y respuestas claras en cada proyecto.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOSOTROS -->
+    <section id="nosotros">
+      <div class="sec-head">
+        <h2>Un servicio cercano, de una profesional comprometida</h2>
+      </div>
+      <div class="about">
+        <div class="body">
+          <p class="quote">En KIZUNALM entregamos un servicio cercano y de calidad, combinando experiencia técnica y compromiso para impulsar el crecimiento de tu negocio.</p>
+          <p>Detrás de KIZUNALM hay una profesional comprometida con más de diez años en atención al cliente. Disfruto ayudar a emprendedores a ordenar su negocio y a que sus clientes queden contentos.</p>
+          <p>También estudié desarrollo web con JavaScript, así que puedo armar tu página y ayudarte a atender a quienes lleguen a ella.</p>
+          <div class="facts">
+            <span class="fact">+10 años atendiendo clientes</span>
+            <span class="fact">HTML, CSS y JavaScript</span>
+            <span class="fact">Santiago de Chile</span>
+          </div>
+        </div>
+        <div class="values">
+          <div class="val"><span class="dot"></span><h3>Compromiso</h3><p>Tu negocio importa. Me involucro hasta que quede funcionando.</p></div>
+          <div class="val"><span class="dot"></span><h3>Cercanía</h3><p>Hablamos simple, sin palabras técnicas ni letra chica.</p></div>
+          <div class="val"><span class="dot"></span><h3>Claridad</h3><p>Precio cerrado y por escrito antes de empezar.</p></div>
+          <div class="val"><span class="dot"></span><h3>Responsabilidad</h3><p>Cumplo lo que acordamos y te aviso si algo cambia.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICIOS -->
+    <section id="servicios">
+      <div class="sec-head">
+        <h2>Tres servicios para que tu negocio se vea, venda y responda</h2>
+        <p>Cuéntame de tu negocio y te propongo lo que necesitas. Te doy un precio cerrado y por escrito antes de empezar.</p>
+      </div>
+      <div class="cards">
+        <article class="svc">
+          <div class="shots">
+            <div class="shot" role="img" aria-label="Ilustración de una página web con título, botón y productos"><svg viewBox="0 0 400 300" aria-hidden="true" focusable="false">
+<rect class="sv-card" x="40" y="36" width="320" height="228" rx="12"/>
+<circle class="sv-line" cx="60" cy="54" r="5"/><circle class="sv-line" cx="76" cy="54" r="5"/><circle class="sv-line" cx="92" cy="54" r="5"/>
+<rect class="sv-line" x="112" y="46" width="200" height="16" rx="8"/>
+<rect class="sv-ink" x="58" y="84" width="150" height="14" rx="7"/>
+<rect class="sv-line" x="58" y="106" width="124" height="8" rx="4"/>
+<rect class="sv-line" x="58" y="122" width="100" height="8" rx="4"/>
+<rect class="sv-acc" x="58" y="146" width="92" height="26" rx="13"/>
+<rect class="sv-acc" x="236" y="84" width="106" height="88" rx="10"/>
+<text x="289" y="145" text-anchor="middle" font-size="54" font-family="Shippori Mincho, serif" font-weight="700" class="sv-on">絆</text>
+<rect class="sv-line" x="58" y="190" width="88" height="56" rx="8"/><rect class="sv-line" x="156" y="190" width="88" height="56" rx="8"/><rect class="sv-line" x="254" y="190" width="88" height="56" rx="8"/>
+<circle class="sv-leaf" cx="102" cy="212" r="10"/><rect class="sv-leaf" x="236" y="205" width="0" height="0"/>
+<rect class="sv-acc" x="190" y="203" width="20" height="20" rx="5"/><rect class="sv-leaf" x="288" y="203" width="20" height="20" rx="10"/>
+</svg></div>
+            <div class="shot" role="img" aria-label="Ilustración de un celular mostrando un catálogo con botón de WhatsApp"><svg viewBox="0 0 400 300" aria-hidden="true" focusable="false">
+<rect class="sv-card" x="140" y="18" width="120" height="264" rx="22" style="stroke: var(--fg); stroke-width: 3;"/>
+<rect class="sv-ink" x="184" y="30" width="32" height="6" rx="3"/>
+<rect class="sv-ink" x="156" y="52" width="88" height="12" rx="6"/>
+<rect class="sv-acc" x="156" y="74" width="88" height="76" rx="10"/>
+<rect class="sv-line" x="156" y="160" width="70" height="8" rx="4"/>
+<rect class="sv-line" x="156" y="176" width="52" height="8" rx="4"/>
+<rect class="sv-ink" x="156" y="194" width="40" height="12" rx="6"/>
+<rect class="sv-leaf" x="156" y="226" width="88" height="30" rx="15"/>
+<circle class="sv-on" cx="176" cy="241" r="7"/>
+<rect class="sv-card" x="36" y="76" width="86" height="40" rx="14"/>
+<rect class="sv-line" x="48" y="88" width="56" height="7" rx="3.5"/><rect class="sv-line" x="48" y="101" width="40" height="7" rx="3.5"/>
+<rect class="sv-leaf" x="278" y="176" width="86" height="40" rx="14"/>
+<rect class="sv-on" x="290" y="188" width="56" height="7" rx="3.5"/><rect class="sv-on" x="290" y="201" width="40" height="7" rx="3.5"/>
+</svg></div>
+          </div>
+          <div>
+            <h3>Tu negocio, listo para destacar en internet</h3>
+            <p class="what">Páginas web, catálogos digitales y presentación de servicios para que tus clientes conozcan lo que ofreces y sepan cómo contactarte.</p>
+          </div>
+          <ul>
+            <li>Páginas web</li>
+            <li>Catálogos digitales</li>
+            <li>Presentación de tus servicios</li>
+          </ul>
+          <p class="ideal">Ideal para emprendedores que necesitan una presencia digital profesional.</p>
+          <div class="more"><a data-msg="Hola, me interesa el servicio «Tu negocio, listo para destacar en internet». Mi negocio es: " href="#contacto">Cotizar este servicio</a></div>
+        </article>
+
+        <article class="svc">
+          <div class="shots">
+            <div class="shot" role="img" aria-label="Ilustración de un catálogo con productos y precios ordenados"><svg viewBox="0 0 400 300" aria-hidden="true" focusable="false">
+<rect class="sv-card" x="34" y="26" width="160" height="116" rx="12"/><rect class="sv-card" x="206" y="26" width="160" height="116" rx="12"/>
+<rect class="sv-card" x="34" y="158" width="160" height="116" rx="12"/><rect class="sv-card" x="206" y="158" width="160" height="116" rx="12"/>
+<rect class="sv-acc" x="88" y="62" width="52" height="42" rx="6"/><path class="sv-stroke-acc" d="M102 62 v-8 a12 12 0 0 1 24 0 v8"/>
+<path class="sv-leaf" d="M262 58 l16 -8 q10 10 20 0 l16 8 -10 16 -9 -5 v36 h-24 v-36 l-9 5 z"/>
+<rect class="sv-leaf" x="94" y="184" width="40" height="44" rx="7"/><path class="sv-stroke-acc" d="M134 194 h8 a10 10 0 0 1 0 22 h-8"/>
+<rect class="sv-acc" x="258" y="190" width="56" height="42" rx="6"/><rect class="sv-on" x="258" y="202" width="56" height="6"/>
+<rect class="sv-ink" x="50" y="116" width="62" height="10" rx="5"/><rect class="sv-ink" x="222" y="116" width="62" height="10" rx="5"/>
+<rect class="sv-ink" x="50" y="248" width="62" height="10" rx="5"/><rect class="sv-ink" x="222" y="248" width="62" height="10" rx="5"/>
+</svg></div>
+            <div class="shot" role="img" aria-label="Ilustración de una publicación con foto, título y descripción clara"><svg viewBox="0 0 400 300" aria-hidden="true" focusable="false">
+<rect class="sv-card" x="44" y="26" width="312" height="248" rx="14"/>
+<rect class="sv-acc" x="62" y="44" width="104" height="104" rx="10"/>
+<path class="sv-stroke-on" d="M96 98 l14 14 l28 -30"/>
+<rect class="sv-ink" x="182" y="50" width="150" height="14" rx="7"/>
+<rect class="sv-line" x="182" y="74" width="112" height="8" rx="4"/>
+<rect class="sv-leaf" x="182" y="98" width="68" height="20" rx="10"/>
+<rect class="sv-line" x="62" y="170" width="276" height="8" rx="4"/>
+<rect class="sv-line" x="62" y="188" width="244" height="8" rx="4"/>
+<rect class="sv-line" x="62" y="206" width="262" height="8" rx="4"/>
+<rect class="sv-acc" x="62" y="230" width="190" height="10" rx="5"/>
+<circle class="sv-leaf" cx="324" cy="62" r="14"/>
+<path class="sv-stroke-on" d="M317 62 l5 5 l9 -10" style="stroke-width: 3;"/>
+</svg></div>
+          </div>
+          <div>
+            <h3>Productos y servicios que dan ganas de comprar</h3>
+            <p class="what">Organizo tus catálogos, mejoro los textos de tus publicaciones y destaco la información que tus clientes necesitan para decidirse.</p>
+          </div>
+          <ul>
+            <li>Todo lo que ofreces, claro y bien presentado</li>
+            <li>Explica mejor lo que vendes y por qué elegirte</li>
+            <li>La información clave a la vista</li>
+          </ul>
+          <p class="ideal">Ideal para tiendas online, negocios de productos, profesionales y prestadores de servicios.</p>
+          <div class="more"><a data-msg="Hola, me interesa el servicio «Productos y servicios que dan ganas de comprar». Mi negocio es: " href="#contacto">Cotizar este servicio</a></div>
+        </article>
+
+        <article class="svc">
+          <div class="shots">
+            <div class="shot" role="img" aria-label="Ilustración de una conversación con un cliente respondida a tiempo"><svg viewBox="0 0 400 300" aria-hidden="true" focusable="false">
+<rect class="sv-card" x="36" y="30" width="196" height="58" rx="16"/>
+<rect class="sv-line" x="54" y="46" width="124" height="8" rx="4"/><rect class="sv-line" x="54" y="62" width="92" height="8" rx="4"/>
+<rect class="sv-acc" x="168" y="102" width="196" height="58" rx="16"/>
+<rect class="sv-on" x="186" y="118" width="132" height="8" rx="4"/><rect class="sv-on" x="186" y="134" width="96" height="8" rx="4"/>
+<rect class="sv-card" x="36" y="176" width="150" height="42" rx="16"/>
+<rect class="sv-line" x="54" y="192" width="104" height="8" rx="4"/>
+<rect class="sv-leaf" x="208" y="232" width="156" height="42" rx="16"/>
+<rect class="sv-on" x="226" y="248" width="94" height="8" rx="4"/>
+<path class="sv-stroke-on" d="M334 252 l6 6 l12 -14" style="stroke-width: 3;"/>
+</svg></div>
+            <div class="shot" role="img" aria-label="Ilustración de una lista de respuestas listas y un reloj"><svg viewBox="0 0 400 300" aria-hidden="true" focusable="false">
+<rect class="sv-card" x="52" y="26" width="296" height="248" rx="14"/>
+<circle class="sv-leaf" cx="90" cy="70" r="14"/><path class="sv-stroke-on" d="M83 70 l5 5 l9 -10" style="stroke-width: 3;"/>
+<rect class="sv-ink" x="118" y="58" width="176" height="10" rx="5"/><rect class="sv-line" x="118" y="76" width="124" height="8" rx="4"/>
+<circle class="sv-leaf" cx="90" cy="126" r="14"/><path class="sv-stroke-on" d="M83 126 l5 5 l9 -10" style="stroke-width: 3;"/>
+<rect class="sv-ink" x="118" y="114" width="150" height="10" rx="5"/><rect class="sv-line" x="118" y="132" width="132" height="8" rx="4"/>
+<circle class="sv-leaf" cx="90" cy="182" r="14"/><path class="sv-stroke-on" d="M83 182 l5 5 l9 -10" style="stroke-width: 3;"/>
+<rect class="sv-ink" x="118" y="170" width="164" height="10" rx="5"/><rect class="sv-line" x="118" y="188" width="104" height="8" rx="4"/>
+<circle class="sv-card" cx="296" cy="232" r="30" style="stroke: var(--thread); stroke-width: 5;"/>
+<path class="sv-stroke-acc" d="M296 214 v18 l12 8" style="stroke-width: 4;"/>
+</svg></div>
+          </div>
+          <div>
+            <h3>Clientes mejor atendidos, menos tiempo perdido</h3>
+            <p class="what">Preparo respuestas para preguntas frecuentes, organizo la información comercial y diseño herramientas sencillas para que atender consultas sea más fácil.</p>
+          </div>
+          <ul>
+            <li>Atiende mejor sin escribir lo mismo todo el día</li>
+            <li>Respuestas listas para preguntas frecuentes</li>
+            <li>Información comercial ordenada</li>
+          </ul>
+          <p class="ideal">Ideal para emprendedores que reciben consultas por WhatsApp, redes sociales o su página web.</p>
+          <div class="more"><a data-msg="Hola, me interesa el servicio «Clientes mejor atendidos, menos tiempo perdido». Mi negocio es: " href="#contacto">Cotizar este servicio</a></div>
+        </article>
+      </div>
+      <p class="note">Cada proyecto se cotiza según lo que necesite tu negocio. La primera conversación no tiene costo.</p>
+    </section>
+
+    <!-- CONTACTO -->
+    <section id="contacto" style="padding-top: 24px;">
+      <div class="contact">
+        <div>
+          <h2>Cuéntame de tu negocio</h2>
+          <p class="intro">Escríbeme con una línea sobre lo que vendes. Te respondo con ideas concretas y un precio, sin compromiso.</p>
+          <div class="contact-data">
+            <div>
+              <small>WhatsApp</small>
+              <b>+56 9 8971 0462</b>
+              <button class="copy" type="button" data-copy="+56989710462">Copiar</button>
+            </div>
+            <div>
+              <small>Correo</small>
+              <b>kizunalm@gmail.com</b>
+              <button class="copy" type="button" data-copy="kizunalm@gmail.com">Copiar</button>
+            </div>
+            <div>
+              <small>Ubicación</small>
+              <b>Santiago, Chile</b>
+            </div>
+            <div>
+              <small>Nuestras redes</small>
+              <b style="user-select: auto;">Facebook · Instagram · LinkedIn</b>
+              <span style="font-size: 14px; opacity: 0.8;">Próximamente</span>
+            </div>
+          </div>
+        </div>
+        <form class="form" id="form" novalidate>
+          <label for="f-nombre">Tu nombre
+            <input id="f-nombre" type="text" autocomplete="name" placeholder="Ej: Camila">
+          </label>
+          <label for="f-negocio">¿Qué vendes o qué hace tu negocio?
+            <input id="f-negocio" type="text" placeholder="Ej: joyas hechas a mano">
+          </label>
+          <label for="f-servicio">¿Qué te interesa?
+            <select id="f-servicio">
+              <option>Tu negocio, listo para destacar en internet</option>
+              <option>Productos y servicios que dan ganas de comprar</option>
+              <option>Clientes mejor atendidos, menos tiempo perdido</option>
+              <option>No lo sé aún, quiero orientación</option>
+            </select>
+          </label>
+          <label for="f-msg">Algo más que quieras contarme
+            <textarea id="f-msg" placeholder="Opcional"></textarea>
+          </label>
+          <a class="btn" id="send" href="#contacto">Enviar por WhatsApp</a>
+          <p class="hint" id="hint" role="status"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="foot">
+      <div class="foot-brand">
+        <a class="brand" href="#inicio" aria-label="KIZUNALM, ir al inicio"><span class="mark" aria-hidden="true">絆</span><span>KIZUNALM</span></a>
+        <p>Páginas web, publicaciones para Mercado Libre y atención al cliente para emprendedores.</p>
+      </div>
+      <nav aria-label="Navegación del pie de página">
+        <h4>Navegación</h4>
+        <ul>
+          <li><a href="#nosotros">Nosotros</a></li>
+          <li><a href="#servicios">Servicios</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </nav>
+      <div>
+        <h4>Contacto</h4>
+        <ul>
+          <li class="val-text">kizunalm@gmail.com</li>
+          <li class="val-text">+56 9 8971 0462</li>
+          <li class="val-text">Santiago, Chile</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Nuestras redes</h4>
+        <ul>
+          <li>Facebook <span class="soon">Próximamente</span></li>
+          <li>Instagram <span class="soon">Próximamente</span></li>
+          <li>LinkedIn <span class="soon">Próximamente</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="copyright">© 2026 KIZUNALM. Todos los derechos reservados.</p>
+  </footer>
+</div>
+
+<script>
+  var WA_NUMBER = "56989710462";
+  var base = "https://wa.me/" + WA_NUMBER + "?text=";
+
+  document.querySelectorAll("[data-msg]").forEach(function (a) {
+    a.addEventListener("click", function () {
+      var servicio = a.getAttribute("data-msg");
+      var f = document.getElementById("f-servicio");
+      var map = [
+        ["destacar en internet", 0], ["dan ganas de comprar", 1], ["mejor atendidos", 2]
+      ];
+      for (var i = 0; i < map.length; i++) {
+        if (servicio.indexOf(map[i][0]) !== -1) { f.selectedIndex = map[i][1]; }
+      }
+    });
+  });
+
+  // Formulario: arma el mensaje y abre WhatsApp
+  var send = document.getElementById("send");
+  var hint = document.getElementById("hint");
+  function buildLink() {
+    var nombre = document.getElementById("f-nombre").value.trim();
+    var negocio = document.getElementById("f-negocio").value.trim();
+    var servicio = document.getElementById("f-servicio").value;
+    var extra = document.getElementById("f-msg").value.trim();
+    var texto = "Hola, soy " + (nombre || "…") + ". Mi negocio: " + (negocio || "…") + ". Me interesa: " + servicio + "." + (extra ? " " + extra : "");
+    return { link: base + encodeURIComponent(texto), ok: nombre && negocio };
+  }
+  document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); });
+  send.addEventListener("click", function (e) {
+    var r = buildLink();
+    if (!r.ok) {
+      e.preventDefault();
+      hint.textContent = "Escribe tu nombre y qué vendes para armar el mensaje.";
+      return;
+    }
+    hint.textContent = "Abriendo WhatsApp con tu mensaje.";
+    send.href = r.link;
+    send.target = "_blank";
+    send.rel = "noopener noreferrer";
+  });
+
+  // Copiar contacto
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var value = btn.getAttribute("data-copy");
+      var done = function () { btn.textContent = "Copiado"; setTimeout(function () { btn.textContent = "Copiar"; }, 1800); };
+      var fallback = function () {
+        var b = btn.previousElementSibling;
+        if (b && window.getSelection) {
+          var r = document.createRange(); r.selectNodeContents(b);
+          var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        }
+        btn.textContent = "Selecciona y copia";
+      };
+      try { navigator.clipboard.writeText(value).then(done, fallback); } catch (err) { fallback(); }
+    });
+  });
+</script>

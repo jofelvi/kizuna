@@ -1,0 +1,44 @@
+---
+import { faqs } from '../data/site';
+---
+
+<section id="preguntas" class="faq page" aria-labelledby="faq-title">
+  <div class="section-head">
+    <h2 id="faq-title">Preguntas frecuentes</h2>
+    <p>Lo que más me preguntan antes de empezar.</p>
+  </div>
+  <div class="label list">
+    {
+      faqs.map((faq) => (
+        <details>
+          <summary>
+            <span>{faq.question}</span>
+            <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+          </summary>
+          <p>{faq.answer}</p>
+        </details>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .faq { padding-block: clamp(56px, 8vw, 112px); }
+  .list { max-width: 880px; overflow: hidden; }
+  details + details { border-top: 2px dashed var(--rule); }
+  summary {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    padding: 20px clamp(20px, 3vw, 32px); cursor: pointer; list-style: none;
+    font-size: clamp(18px, 1.8vw, 21px); font-weight: 700;
+    transition: background-color 160ms;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover { background: var(--label-hover); }
+  .chev { width: 24px; height: 24px; flex: none; fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--ease-out); }
+  details[open] .chev { transform: rotate(180deg); }
+  details p { padding: 0 clamp(20px, 3vw, 32px) 22px; color: var(--ink-2); font-size: 17px; max-width: 68ch; }
+  @media (prefers-reduced-motion: no-preference) {
+    details[open] p { animation: open 320ms var(--ease-out); }
+  }
+  @keyframes open { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+</style>

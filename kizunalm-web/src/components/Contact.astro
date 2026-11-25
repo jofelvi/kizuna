@@ -1,0 +1,154 @@
+---
+import WhatsAppIcon from './icons/WhatsAppIcon.astro';
+import { contact, contactSection, socialNetworks } from '../data/site';
+import { plans } from '../data/plans';
+
+const options = [...plans.map((plan) => plan.name), 'No lo sé aún, quiero orientación'];
+---
+
+<section id="contacto" class="contact page" aria-labelledby="contact-title">
+  <div class="contact-grid">
+    <div class="intro">
+      <h2 id="contact-title">{contactSection.title}</h2>
+      <p>{contactSection.intro}</p>
+      <dl class="data-list">
+        <div>
+          <dt>WhatsApp</dt>
+          <dd><span class="value">{contact.whatsappDisplay}</span><button class="copy" type="button" data-copy={`+${contact.whatsappNumber}`}>Copiar</button></dd>
+        </div>
+        <div>
+          <dt>Correo</dt>
+          <dd><span class="value">{contact.email}</span><button class="copy" type="button" data-copy={contact.email}>Copiar</button></dd>
+        </div>
+        <div><dt>Ubicación</dt><dd><span class="value">{contact.location}</span></dd></div>
+        <div><dt>Redes</dt><dd><span class="value soft">{socialNetworks.join(' · ')}: próximamente</span></dd></div>
+      </dl>
+    </div>
+
+    <form class="label form" id="contact-form" data-whatsapp={contact.whatsappNumber} novalidate>
+      <div class="form-head label-field"><span>Formulario de contacto</span><strong>Te respondo por WhatsApp</strong></div>
+      <hr class="perforation" />
+      <div class="fields">
+        <label>Tu nombre
+          <input name="name" type="text" autocomplete="name" placeholder="Ej: Camila" required />
+        </label>
+        <label>¿Qué vende tu negocio?
+          <input name="business" type="text" placeholder="Ej: joyas hechas a mano" required />
+        </label>
+        <label>¿Qué plan te interesa?
+          <select name="service">{options.map((option) => <option>{option}</option>)}</select>
+        </label>
+        <label>Algo más que quieras contarme
+          <textarea name="message" placeholder="Opcional"></textarea>
+        </label>
+        <button class="btn btn-tape" type="submit"><WhatsAppIcon />Enviar por WhatsApp</button>
+        <p class="hint" id="contact-hint" role="status"></p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#contact-form');
+  const hint = document.querySelector<HTMLParagraphElement>('#contact-hint');
+
+  function fieldValue(name: string): string {
+    const field = form?.elements.namedItem(name);
+    return field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement
+      ? field.value.trim()
+      : '';
+  }
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!hint) return;
+    const name = fieldValue('name');
+    const business = fieldValue('business');
+    const service = fieldValue('service');
+    const message = fieldValue('message');
+
+    form.querySelectorAll<HTMLInputElement>('input[required]').forEach((input) => {
+      input.setAttribute('aria-invalid', String(input.value.trim() === ''));
+    });
+    if (!name || !business) {
+      hint.textContent = 'Escribe tu nombre y qué vende tu negocio para armar el mensaje.';
+      form.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus();
+      return;
+    }
+    const text = `Hola, soy ${name}. Mi negocio: ${business}. Me interesa: ${service}.${message ? ` ${message}` : ''}`;
+    hint.textContent = 'Abriendo WhatsApp con tu mensaje.';
+    window.open(`https://wa.me/${form.dataset.whatsapp}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.copy').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const value = button.dataset.copy ?? '';
+      try {
+        await navigator.clipboard.writeText(value);
+        button.textContent = 'Copiado';
+        button.dataset.copied = '';
+        setTimeout(() => {
+          button.textContent = 'Copiar';
+          delete button.dataset.copied;
+        }, 1800);
+      } catch {
+        const target = button.previousElementSibling;
+        const selection = window.getSelection();
+        if (target && selection) {
+          const range = document.createRange();
+          range.selectNodeContents(target);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+        button.textContent = 'Selecciona y copia';
+      }
+    });
+  });
+</script>
+
+<style>
+  .contact { padding-block: clamp(56px, 8vw, 112px); }
+  .contact-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(28px, 5vw, 72px); align-items: start; }
+  .intro { display: grid; gap: 18px; }
+  .intro h2 { font-size: clamp(44px, 6.4vw, 84px); color: var(--ink); }
+  .intro > p { font-size: clamp(17px, 1.5vw, 20px); max-width: 46ch; }
+  .data-list { margin: 8px 0 0; display: grid; gap: 14px; }
+  .data-list dt { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+  .data-list dd { margin: 2px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .value { font-size: 20px; font-weight: 700; color: var(--ink); overflow-wrap: anywhere; }
+  .value.soft { font-size: 16px; font-weight: 600; color: var(--kraft-ink); }
+  .copy {
+    font: inherit; font-size: 13px; font-weight: 700; color: var(--ink);
+    min-height: 36px; background: var(--label); border: 0; border-radius: 3px; padding: 0 12px; cursor: pointer;
+    box-shadow: 0 1px 1px rgb(58 36 14 / 0.3);
+    transition: background-color 160ms, color 160ms, transform 80ms;
+  }
+  .copy:hover { background: var(--field); }
+  .copy:active { transform: scale(0.95); }
+  .copy[data-copied] { background: var(--tape); color: var(--tape-ink); }
+
+  .form { overflow: hidden; transform: rotate(0.6deg); }
+  .form-head { padding: 18px clamp(20px, 3vw, 32px); }
+  .form-head strong { font-size: 16px; }
+  .fields { display: grid; gap: 16px; padding: 22px clamp(20px, 3vw, 32px) 26px; }
+  label { display: grid; gap: 6px; font-size: 14px; font-weight: 700; }
+  input, select, textarea {
+    font: inherit; font-size: 17px; font-weight: 400; color: var(--ink);
+    background: var(--field); border: 2px solid var(--rule); border-radius: 4px;
+    min-height: 50px; padding: 10px 14px; width: 100%; min-width: 0;
+    transition: border-color 160ms;
+  }
+  textarea { min-height: 104px; resize: vertical; }
+  input::placeholder, textarea::placeholder { color: var(--ink-3); }
+  input:hover, select:hover, textarea:hover { border-color: var(--ink-3); }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--tape); outline-offset: 1px; border-color: var(--ink); }
+  [aria-invalid="true"] { border-color: var(--alert); }
+  .hint { min-height: 1.4em; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+
+  @media (pointer: coarse) { .copy { min-height: 44px; padding-inline: 16px; } }
+
+  @media (max-width: 900px) {
+    .contact-grid { grid-template-columns: minmax(0, 1fr); }
+    .form { transform: none; }
+  }
+</style>

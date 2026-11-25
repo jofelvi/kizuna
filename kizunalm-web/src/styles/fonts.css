@@ -1,0 +1,14 @@
+/*
+ * Shippori Mincho (SIL OFL 1.1), tomada de @fontsource/shippori-mincho.
+ * Solo se usa para el carácter 絆 (U+7D46) del timbre y el logo: un único archivo de 14 KB
+ * restringido a ese carácter. Si algún día se agregan más kanji, copia el trozo que los contenga
+ * desde node_modules/@fontsource/shippori-mincho/files (instala el paquete para tenerlo a mano).
+ */
+@font-face {
+  font-family: "Shippori Mincho";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/shippori-mincho-78-700-normal.woff2") format("woff2");
+  unicode-range: U+7D46;
+}

@@ -1,0 +1,26 @@
+---
+/** Aviso del ambiente de integración de Webpay con los datos de prueba públicos de Transbank. */
+---
+
+<aside class="sandbox" aria-label="Modo de prueba">
+  <p class="title"><strong>Modo de prueba.</strong> No se cobra dinero real. Para simular el pago usa:</p>
+  <dl>
+    <div><dt>Tarjeta aprobada (Visa)</dt><dd class="data">4051 8856 0044 6623</dd></div>
+    <div><dt>Tarjeta rechazada (Mastercard)</dt><dd class="data">5186 0595 5959 0568</dd></div>
+    <div><dt>CVV · Vencimiento</dt><dd class="data">123 · cualquier fecha futura</dd></div>
+    <div><dt>RUT · Clave (si la pide)</dt><dd class="data">11.111.111-1 · 123</dd></div>
+  </dl>
+</aside>
+
+<style>
+  .sandbox {
+    display: grid; gap: 10px; padding: 14px 16px;
+    background: repeating-linear-gradient(-45deg, var(--field) 0 14px, #F6F2FF 14px 28px);
+    border: 2px dashed var(--tape); border-radius: 4px; color: var(--ink);
+  }
+  .title { font-size: 15px; }
+  dl { margin: 0; display: grid; gap: 6px; }
+  dl div { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14px; }
+  dt { color: var(--ink-2); font-weight: 600; }
+  dd { margin: 0; font-size: 13px; }
+</style>

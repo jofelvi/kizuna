@@ -1,0 +1,57 @@
+---
+import Brand from './Brand.astro';
+import { contact, navLinks, socialNetworks } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="page foot">
+    <div class="foot-brand">
+      <Brand />
+      <p>Atención al cliente ordenada, publicaciones que venden y páginas web para emprendedores en Chile.</p>
+    </div>
+    <nav aria-label="Navegación del pie de página">
+      <h2>Navegación</h2>
+      <ul>{navLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}</ul>
+    </nav>
+    <div>
+      <h2>Contacto</h2>
+      <ul>
+        <li><a href={`https://wa.me/${contact.whatsappNumber}`} target="_blank" rel="noopener noreferrer">{contact.whatsappDisplay}</a></li>
+        <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+        <li>{contact.location}</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Redes</h2>
+      <ul>{socialNetworks.map((network) => <li>{network} <span class="soon">próximamente</span></li>)}</ul>
+    </div>
+  </div>
+  <div class="page bottom">
+    <p>© {year} KIZUNALM. Todos los derechos reservados.</p>
+    <p>Pagos procesados por Webpay Plus (Transbank).</p>
+  </div>
+</footer>
+
+<style>
+  .footer { background: var(--ink); color: var(--ink-panel-text); padding-block: 64px max(28px, env(safe-area-inset-bottom)); font-size: 15px; }
+  .foot { display: grid; grid-template-columns: minmax(0, 5fr) repeat(3, minmax(0, 3fr)); gap: 32px; }
+  .foot-brand { display: grid; gap: 14px; align-content: start; color: var(--label); }
+  .foot-brand p { max-width: 34ch; color: var(--ink-panel-text); }
+  h2 { font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--label); margin-bottom: 14px; font-variation-settings: "wdth" 100; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  a { text-decoration: none; }
+  a:hover { color: var(--label); text-decoration: underline; }
+  .soon { margin-left: 6px; font-size: 12px; border: 1px solid var(--ink-panel-chip); border-radius: 999px; padding: 1px 8px; }
+  /* En pantallas táctiles cada enlace del pie es un blanco de 44px. */
+  @media (pointer: coarse) {
+    ul { gap: 0; }
+    li { min-height: 44px; display: flex; align-items: center; flex-wrap: wrap; }
+    li a { display: inline-flex; align-items: center; min-height: 44px; }
+  }
+  .bottom { margin-top: 48px; padding-top: 20px; border-top: 2px dashed var(--ink-panel-line); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 13px; }
+  .footer :focus-visible { outline-color: var(--tape-light); }
+  @media (max-width: 820px) { .foot { grid-template-columns: repeat(2, minmax(0, 1fr)); } .foot-brand { grid-column: 1 / -1; } }
+  @media (max-width: 480px) { .foot { grid-template-columns: minmax(0, 1fr); } }
+</style>

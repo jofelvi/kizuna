@@ -1,0 +1,53 @@
+---
+import { difference } from '../data/site';
+---
+
+<section class="difference page" aria-labelledby="difference-title">
+  <div class="section-head">
+    <h2 id="difference-title">{difference.title}</h2>
+    <p>{difference.lead}</p>
+  </div>
+  <div class="label table" role="table" aria-label="Comparación con lo habitual" data-inview>
+    <div class="tr head" role="row">
+      <span role="columnheader">Lo habitual</span>
+      <span role="columnheader">Con KIZUNALM</span>
+    </div>
+    {
+      difference.rows.map((row, index) => (
+        <div class="tr" role="row" style={`--i:${index}`}>
+          <p class="usual" role="cell">{row.usual}</p>
+          <p class="here" role="cell">{row.here}</p>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .difference { padding-block: clamp(40px, 6vw, 80px); }
+  .table { overflow: hidden; }
+  .tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .tr + .tr { border-top: 2px dashed var(--rule); }
+  .tr > * { padding: clamp(16px, 2.2vw, 26px) clamp(18px, 3vw, 36px); }
+  .head span { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+  .head span:last-child, .here { background: var(--ink); color: var(--label); }
+  .usual { color: var(--ink-2); font-size: 16px; }
+  .tr > .here { font-size: 17px; font-weight: 600; position: relative; padding-left: calc(clamp(18px, 3vw, 36px) + 28px); }
+  .here::before {
+    content: ""; position: absolute; left: clamp(18px, 3vw, 36px); top: calc(clamp(16px, 2.2vw, 26px) + 0.3em);
+    width: 16px; height: 9px; border-left: 3px solid var(--tape-light); border-bottom: 3px solid var(--tape-light); transform: rotate(-45deg);
+  }
+  /* Cada fila se verifica: el check se traza de su trazo corto al largo, uno tras otro. */
+  :global(html.motion) .table:not([data-seen]) .here::before { clip-path: inset(0 100% 0 0); }
+  @media (prefers-reduced-motion: no-preference) {
+    .table[data-seen] .here::before { animation: check-draw 380ms var(--ease-out) calc(200ms + var(--i) * 120ms) backwards; }
+  }
+  @keyframes check-draw { from { clip-path: inset(0 100% 0 0); } }
+
+  @media (max-width: 640px) {
+    .tr { grid-template-columns: minmax(0, 1fr); }
+    .head { display: none; }
+    .usual::before { content: "Lo habitual: "; font-weight: 700; }
+    .tr + .tr { border-top-width: 6px; border-top-style: solid; border-top-color: var(--kraft); }
+  }
+</style>

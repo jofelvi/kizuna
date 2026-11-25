@@ -1,0 +1,244 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Barcode from '../../components/Barcode.astro';
+import SandboxNotice from '../../components/checkout/SandboxNotice.astro';
+import ArrowIcon from '../../components/icons/ArrowIcon.astro';
+import { checkoutSchema, depositFor, findPlan, formatCLP } from '../../lib/checkout';
+import { createWebpayTransaction, isWebpaySandbox, newBuyOrder } from '../../lib/webpay';
+import { PUBLIC_SITE_URL } from 'astro:env/server';
+
+export const prerender = false;
+
+const plan = findPlan(Astro.params.plan ?? '');
+if (!plan) return Astro.redirect('/#planes', 302);
+
+const deposit = depositFor(plan);
+const balance = plan.price - deposit;
+
+type FieldName = 'name' | 'email' | 'phone' | 'business' | 'terms';
+let values: Partial<Record<FieldName, string>> = {};
+let errors: Partial<Record<FieldName, string>> = {};
+let gatewayError = '';
+let redirect: { url: string; token: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const raw = Object.fromEntries(
+    (['name', 'email', 'phone', 'business', 'terms'] as const).map((key) => [key, String(form.get(key) ?? '')]),
+  );
+  values = raw;
+  const parsed = checkoutSchema.safeParse({ ...raw, plan: plan.id });
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) {
+      const key = issue.path[0];
+      if (typeof key === 'string' && !(key in errors)) errors[key as FieldName] = issue.message;
+    }
+  } else {
+    try {
+      const buyOrder = newBuyOrder(plan.code);
+      redirect = await createWebpayTransaction({
+        buyOrder,
+        sessionId: crypto.randomUUID().slice(0, 32),
+        amount: deposit,
+        returnUrl: new URL('/pago/resultado', PUBLIC_SITE_URL ?? Astro.url).toString(),
+      });
+    } catch (error: unknown) {
+      console.error('[webpay:create]', error);
+      gatewayError = 'Webpay no respondió. Tus datos no se enviaron y no se hizo ningún cobro. Intenta de nuevo en un minuto.';
+    }
+  }
+}
+
+const hasErrors = Object.keys(errors).length > 0;
+---
+
+<Layout title={`Abonar ${plan.name} · KIZUNALM`} description={`Reserva tu proyecto ${plan.name} con un abono del 50 % por Webpay.`} noindex>
+  {
+    redirect ? (
+      <main class="handoff page">
+        <form id="webpay-handoff" method="post" action={redirect.url} class="label handoff-label">
+          <input type="hidden" name="token_ws" value={redirect.token} />
+          <span class="stamp handoff-stamp" aria-hidden="true">絆</span>
+          <h1>Te estamos llevando a Webpay</h1>
+          <p>Ahí pagas el abono de <strong class="data">{formatCLP(deposit)}</strong> con tu tarjeta, de forma segura.</p>
+          <button class="btn btn-tape" type="submit">Ir a Webpay ahora</button>
+        </form>
+        <script is:inline>document.getElementById('webpay-handoff').submit();</script>
+      </main>
+    ) : (
+      <Fragment>
+        <Nav />
+        <main class="page checkout">
+          <a class="back" href="/#planes"><ArrowIcon direction="left" /> Volver a los planes</a>
+          <div class="checkout-grid">
+            <article class="label waybill" aria-labelledby="waybill-title" style={`view-transition-name: plan-${plan.id}`}>
+              <header class="waybill-head">
+                <div class="label-field">
+                  <span>Guía de reserva</span>
+                  <strong class="data">KZ-{plan.code}</strong>
+                </div>
+                <span class="stamp chosen" aria-hidden="true">ELEGIDO</span>
+              </header>
+              <hr class="perforation" />
+              <div class="waybill-body">
+                <h1 id="waybill-title">{plan.name}</h1>
+                <p class="tagline">{plan.tagline}</p>
+                <ul class="includes">
+                  {plan.includes.map((item) => <li>{item}</li>)}
+                </ul>
+                <p class="eta">Plazo: {plan.delivery}</p>
+              </div>
+              <hr class="perforation" />
+              <dl class="totals">
+                <div><dt>Valor del proyecto</dt><dd class="data">{formatCLP(plan.price)}</dd></div>
+                <div class="due"><dt>Abono hoy (50 %)</dt><dd class="data">{formatCLP(deposit)}</dd></div>
+                <div><dt>Saldo a la entrega</dt><dd class="data">{formatCLP(balance)}</dd></div>
+              </dl>
+              <p class="tax-note">{plan.priceNote}</p>
+              <Barcode value={`KZ-${plan.code}-${plan.price}`} class="waybill-code" />
+            </article>
+
+            <section class="label pay" aria-labelledby="pay-title">
+              <h2 id="pay-title">Tus datos para la reserva</h2>
+              <p class="pay-intro">Con estos datos te contacto para agendar la primera reunión y empezar tu proyecto.</p>
+
+              {isWebpaySandbox && <SandboxNotice />}
+
+              {gatewayError && <p class="alert" role="alert">{gatewayError}</p>}
+              {hasErrors && <p class="alert" role="alert">Revisa los campos marcados para continuar.</p>}
+
+              <form method="post" novalidate class="pay-form" id="pay-form">
+                <label>
+                  <span>Tu nombre</span>
+                  <input name="name" autocomplete="name" required value={values.name} aria-invalid={errors.name ? 'true' : undefined} aria-describedby={errors.name ? 'e-name' : undefined} />
+                  {errors.name && <small id="e-name" class="field-error">{errors.name}</small>}
+                </label>
+                <label>
+                  <span>Correo</span>
+                  <input name="email" type="email" autocomplete="email" inputmode="email" required value={values.email} aria-invalid={errors.email ? 'true' : undefined} aria-describedby={errors.email ? 'e-email' : undefined} />
+                  {errors.email && <small id="e-email" class="field-error">{errors.email}</small>}
+                </label>
+                <label>
+                  <span>Celular (WhatsApp)</span>
+                  <input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="9 1234 5678" required value={values.phone} aria-invalid={errors.phone ? 'true' : undefined} aria-describedby={errors.phone ? 'e-phone' : undefined} />
+                  {errors.phone && <small id="e-phone" class="field-error">{errors.phone}</small>}
+                </label>
+                <label>
+                  <span>¿Qué vende tu negocio?</span>
+                  <input name="business" placeholder="Ej: joyas hechas a mano" required value={values.business} aria-invalid={errors.business ? 'true' : undefined} aria-describedby={errors.business ? 'e-business' : undefined} />
+                  {errors.business && <small id="e-business" class="field-error">{errors.business}</small>}
+                </label>
+                <label class="check">
+                  <input type="checkbox" name="terms" checked={values.terms === 'on'} aria-invalid={errors.terms ? 'true' : undefined} aria-describedby="terms-text" />
+                  <span id="terms-text">Entiendo que el abono del 50 % reserva mi proyecto y se descuenta del valor total. El saldo se paga a la entrega.</span>
+                </label>
+                {errors.terms && <small class="field-error">{errors.terms}</small>}
+                <button class="btn btn-tape pay-btn" type="submit"><span class="pay-label">Pagar {formatCLP(deposit)} con Webpay</span></button>
+                <p class="secure">Pago procesado por Webpay Plus de Transbank. KIZUNALM no ve ni guarda los datos de tu tarjeta.</p>
+              </form>
+            </section>
+          </div>
+        </main>
+      </Fragment>
+    )
+  }
+</Layout>
+
+<script>
+  // Mientras el servidor habla con Webpay el botón lo dice, y no se puede enviar dos veces.
+  const payForm = document.querySelector<HTMLFormElement>('#pay-form');
+  const payButton = payForm?.querySelector<HTMLButtonElement>('.pay-btn');
+  const payLabel = payButton?.querySelector<HTMLSpanElement>('.pay-label');
+  const idleText = payLabel?.textContent ?? '';
+
+  payForm?.addEventListener('submit', (event) => {
+    if (!payButton || !payLabel) return;
+    if (payButton.getAttribute('aria-busy') === 'true') {
+      event.preventDefault();
+      return;
+    }
+    payButton.setAttribute('aria-busy', 'true');
+    payLabel.textContent = 'Conectando con Webpay…';
+  });
+  // Al volver con «Atrás» desde Webpay la página sale de la caché del navegador: se reactiva el botón.
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted || !payButton || !payLabel) return;
+    payButton.removeAttribute('aria-busy');
+    payLabel.textContent = idleText;
+  });
+</script>
+
+<style>
+  .checkout { padding-block: 32px 96px; }
+  .back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 12px; font-weight: 700; color: var(--ink); text-decoration: none; }
+  .back:hover { text-decoration: underline; }
+  .checkout-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(20px, 3vw, 40px); align-items: start; }
+
+  .waybill { transform: rotate(-0.8deg); overflow: hidden; }
+  .waybill-head, .waybill-body, .totals, .tax-note, .waybill :global(.waybill-code) { padding-inline: clamp(20px, 2.6vw, 32px); }
+  .waybill-head { display: flex; justify-content: space-between; align-items: center; padding-block: 18px; }
+  .chosen { --stamp-rotate: -7deg; font-weight: 800; font-variation-settings: "wdth" 75; font-size: 22px; letter-spacing: 0.12em; padding: 6px 12px; transform: rotate(-7deg); }
+  .waybill-body { display: grid; gap: 12px; padding-block: 22px; }
+  .waybill h1 { font-size: clamp(40px, 5vw, 64px); }
+  .tagline { color: var(--ink-2); }
+  .includes { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 15px; }
+  .includes li { padding-left: 20px; position: relative; }
+  .includes li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 10px; height: 10px; border: 2px solid var(--ink); border-radius: 2px; }
+  .eta { font-size: 14px; font-weight: 600; color: var(--ink-2); }
+  .totals { margin: 0; padding-block: 18px 8px; display: grid; gap: 10px; }
+  .totals div { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .totals dt { font-weight: 600; }
+  .totals dd { margin: 0; font-size: 17px; }
+  .totals .due { padding: 10px 12px; margin-inline: -12px; background: var(--ink); color: var(--label); border-radius: 4px; }
+  .totals .due dd { font-size: 22px; font-weight: 700; }
+  .tax-note { font-size: 13px; color: var(--ink-2); padding-bottom: 14px; }
+  .waybill :global(.waybill-code) { --barcode-height: 54px; padding-bottom: 20px; }
+
+  .pay { padding: clamp(22px, 3vw, 40px); display: grid; gap: 16px; }
+  .pay h2 { font-size: clamp(32px, 3.6vw, 44px); }
+  .pay-intro { color: var(--ink-2); }
+  .pay-form { display: grid; gap: 16px; }
+  .pay-form label { display: grid; gap: 6px; }
+  .pay-form label > span { font-size: 14px; font-weight: 700; }
+  .pay-form input:not([type="checkbox"]) {
+    font: inherit; font-size: 17px; color: var(--ink);
+    background: var(--field); border: 2px solid var(--rule); border-radius: 4px;
+    min-height: 50px; padding: 0 14px; width: 100%;
+    transition: border-color 160ms;
+  }
+  .pay-form input::placeholder { color: var(--ink-3); }
+  .pay-form input:hover { border-color: var(--ink-3); }
+  .pay-form input:focus-visible { outline: 3px solid var(--tape); outline-offset: 1px; border-color: var(--ink); }
+  .pay-form [aria-invalid="true"] { border-color: var(--alert) !important; }
+  .check { grid-template-columns: 22px 1fr; align-items: start; font-size: 15px; }
+  .check input { width: 22px; height: 22px; margin: 2px 0 0; }
+  .check { min-height: 44px; cursor: pointer; }
+  .check > span { font-weight: 500 !important; font-size: 15px !important; color: var(--ink-2); }
+  .field-error { color: var(--alert); font-size: 14px; font-weight: 600; }
+  .alert { padding: 12px 14px; border: 2px solid var(--alert); border-radius: 4px; color: var(--alert); font-weight: 600; background: var(--field); }
+  .pay-btn { width: 100%; min-height: 58px; font-size: 18px; }
+  /* Conectando: la cinta corre bajo el texto, como un despacho en movimiento. */
+  .pay-btn[aria-busy="true"] {
+    cursor: progress; transform: none; box-shadow: none;
+    background: repeating-linear-gradient(-45deg, var(--tape) 0 14px, var(--tape-deep) 14px 28px) 0 0 / 40px 40px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pay-btn[aria-busy="true"] { animation: belt 700ms linear infinite; }
+    /* El timbre cae cuando la etiqueta ya llegó desde la portada. */
+    .chosen { animation: stamp-thunk 520ms var(--ease-out) 440ms backwards; }
+    .handoff-stamp { animation: stamp-thunk 520ms var(--ease-out) 100ms backwards; }
+  }
+  @keyframes belt { to { background-position: 40px 0; } }
+  .secure { font-size: 13px; color: var(--ink-2); text-align: center; }
+
+  .handoff { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+  .handoff-label { max-width: 460px; padding: 36px; display: grid; gap: 14px; justify-items: start; }
+  .handoff-label h1 { font-size: 40px; }
+  .handoff-stamp { --stamp-rotate: -8deg; width: 72px; height: 72px; font-family: var(--font-kanji); font-size: 48px; transform: rotate(-8deg); }
+
+  @media (max-width: 900px) {
+    .checkout-grid { grid-template-columns: minmax(0, 1fr); }
+    .waybill { transform: none; }
+  }
+</style>

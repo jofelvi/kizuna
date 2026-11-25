@@ -1,0 +1,40 @@
+---
+// Fuentes servidas desde el propio sitio: sin viaje a Google Fonts (ni su DNS ni su TLS).
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/martian-mono/wght.css';
+import '../styles/fonts.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Páginas del pago: no se indexan. */
+  noindex?: boolean;
+}
+
+const { title, description, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#B98B5A" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+  </head>
+  <body>
+    <slot />
+    <script>import '../scripts/motion';</script>
+  </body>
+</html>

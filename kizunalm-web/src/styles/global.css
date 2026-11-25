@@ -1,0 +1,199 @@
+/* Mundo «Encomienda»: cartón kraft, etiquetas térmicas, cinta violeta y timbre 絆.
+   Un único negro térmico imprime todo; el violeta es la cinta y el timbre de la marca. */
+:root {
+  --kraft: #B98B5A;
+  --kraft-deep: #8F6640;
+  --kraft-shade: #A47A4E;
+  --kraft-ink: #2B1B0C;           /* texto directo sobre el kraft */
+  --label: #F7F6F2;               /* papel térmico */
+  --label-shade: #E9E6DE;
+  --ink: #141414;                 /* tinta térmica */
+  --ink-2: #48463F;               /* tinta térmica al 75 % */
+  --ink-3: #6E6A60;               /* tinta térmica al 55 %, solo texto ≥ 14px en negrita o datos */
+  --rule: #CFCAC0;
+  --tape: #5B2DBE;
+  --tape-deep: #46209A;
+  --tape-ink: #F1EBFF;
+  --stamp: #5B2DBE;
+  --alert: #B3261E;               /* solo para errores y «RECHAZADO» */
+  --label-hover: #FBFAF7;         /* fila de etiqueta bajo el cursor */
+  --field: #FFFFFF;               /* fondo de campos de formulario */
+  --tape-light: #B79CF0;          /* violeta legible sobre tinta negra */
+  --ink-panel-text: #CFCAC0;      /* texto secundario sobre tinta negra */
+  --ink-panel-line: #3A3833;      /* filete sobre tinta negra */
+  --ink-panel-chip: #48463F;      /* borde de chip sobre tinta negra */
+
+  --font-label: "Archivo Variable", "Arial Narrow", system-ui, sans-serif;
+  --font-data: "Martian Mono Variable", ui-monospace, "Cascadia Mono", monospace;
+  --font-kanji: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-label: 0 1px 1px rgb(58 36 14 / 0.28), 0 10px 24px -10px rgb(58 36 14 / 0.55);
+  --shadow-label-lift: 0 2px 2px rgb(58 36 14 / 0.25), 0 22px 40px -16px rgb(58 36 14 / 0.6);
+  --radius-label: 12px;          /* esquina troquelada de etiqueta térmica */
+  --nav-height: 68px;
+  --page: min(1180px, 100% - 2 * clamp(16px, 4vw, 40px));
+
+  /* Fibra del kraft: ruido alargado en horizontal + manchas suaves. Textura procedural, sin raster. */
+  --kraft-fibers: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='0.025 0.75' numOctaves='3' seed='11' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.27  0 0 0 0 0.17  0 0 0 0 0.07  0 0 0 0.42 0'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>");
+  --kraft-mottle: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1400' height='1400'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='0.0025' numOctaves='2' seed='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.98  0 0 0 0 0.86  0 0 0 0 0.68  0 0 0 0.22 0'/></filter><rect width='100%' height='100%' filter='url(%23m)'/></svg>");
+  --ink-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.4 1.55'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+
+  color-scheme: light;
+  accent-color: var(--tape);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--kraft-ink);
+  background-color: var(--kraft);
+  /* Fibra horizontal + ondas del corrugado que se transparentan bajo el papel + manchas amplias. */
+  background-image: var(--kraft-fibers),
+    repeating-linear-gradient(180deg, rgb(70 42 14 / 0.05) 0 3px, rgb(255 236 205 / 0.04) 3px 5px, transparent 5px 9px),
+    var(--kraft-mottle);
+  font-family: var(--font-label);
+  font-size: 17px;
+  line-height: 1.55;
+  font-variation-settings: "wdth" 100;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-family: var(--font-label);
+  font-weight: 800;
+  font-stretch: 72%;
+  font-variation-settings: "wdth" 72;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+p { margin: 0; text-wrap: pretty; }
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1.5px; }
+img, svg { max-width: 100%; }
+
+::selection { background: var(--tape); color: var(--tape-ink); }
+:focus-visible { outline: 3px solid var(--tape); outline-offset: 3px; border-radius: 3px; }
+html { scrollbar-color: var(--kraft-deep) var(--kraft); }
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { background: var(--kraft); }
+::-webkit-scrollbar-thumb { background: var(--kraft-deep); border-radius: 8px; border: 3px solid var(--kraft); }
+
+.page { width: var(--page); margin-inline: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+section { scroll-margin-top: calc(var(--nav-height) + 12px); }
+
+/* Encabezado de sección impreso directo sobre el kraft */
+.section-head { display: grid; gap: 14px; max-width: 62ch; margin-bottom: clamp(28px, 4vw, 48px); }
+.section-head h2 { font-size: clamp(40px, 6.4vw, 84px); color: var(--ink); }
+.section-head p { font-size: clamp(17px, 1.6vw, 20px); color: var(--kraft-ink); max-width: 56ch; }
+
+/* Datos tabulares (precios, códigos, plazos) */
+.data { font-family: var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+
+/* Etiqueta térmica: la pieza básica del mundo */
+.label {
+  position: relative;
+  background: var(--label);
+  color: var(--ink);
+  border-radius: var(--radius-label);
+  box-shadow: var(--shadow-label);
+}
+.label-field { display: grid; gap: 2px; }
+.label-field > span:first-child { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+.perforation { height: 0; border: 0; border-top: 2px dashed var(--rule); margin: 0; }
+
+/* Botones */
+.btn {
+  --btn-bg: var(--ink);
+  --btn-fg: var(--label);
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 52px; padding: 0 24px;
+  font: inherit; font-size: 17px; font-weight: 700; font-variation-settings: "wdth" 88;
+  color: var(--btn-fg); background: var(--btn-bg);
+  border: 2px solid var(--btn-bg); border-radius: 4px;
+  text-decoration: none; cursor: pointer;
+  transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out), background-color 160ms;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: 0 10px 18px -10px rgb(20 20 20 / 0.6); }
+.btn:active { transform: translateY(0) scale(0.98); box-shadow: none; transition-duration: 80ms; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-tape { --btn-bg: var(--tape); --btn-fg: var(--tape-ink); }
+.btn-tape:hover { --btn-bg: var(--tape-deep); }
+.btn-ghost { --btn-fg: var(--ink); background: transparent; }
+.btn-ghost:hover { background: rgb(20 20 20 / 0.06); }
+.btn svg { width: 20px; height: 20px; flex: none; }
+
+/* Timbre de goma: tinta violeta con grano, como un sello real */
+.stamp {
+  display: inline-grid; place-items: center;
+  color: var(--stamp);
+  border: 0.08em solid currentColor; border-radius: 0.14em;
+  -webkit-mask-image: var(--ink-grain); mask-image: var(--ink-grain);
+  -webkit-mask-size: 160px; mask-size: 160px;
+  line-height: 1;
+}
+
+@media (max-width: 820px) {
+  :root { --nav-height: 60px; }
+}
+
+/* ─── Movimiento ───────────────────────────────────────────────────────────
+   Un solo idioma: lo que pasa con una encomienda. Las etiquetas se pegan, la cinta
+   se desenrolla, el timbre cae, el código se imprime y se escanea.
+   Las entradas al hacer scroll dependen de html.motion, que agrega src/scripts/motion.ts:
+   sin JS no hay estado oculto y todo queda visible. Los keyframes solo declaran «from»
+   y se usan con relleno «backwards», así el estado final es siempre el natural del
+   elemento (y el hover o el foco siguen funcionando después de la entrada). */
+
+@keyframes tape-unroll { from { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); } }
+@keyframes stamp-thunk {
+  0% { opacity: 0; transform: rotate(var(--stamp-rotate, -8deg)) scale(1.35); filter: blur(3px); }
+  60% { opacity: 1; transform: rotate(var(--stamp-rotate, -8deg)) scale(0.97); filter: blur(0); }
+  100% { opacity: 1; transform: rotate(var(--stamp-rotate, -8deg)) scale(1); }
+}
+@keyframes label-apply { from { opacity: 0; translate: 0 36px; scale: 1.035; box-shadow: var(--shadow-label-lift); } }
+@keyframes soft-fade { from { opacity: 0; } }
+
+/* Antes de entrar en pantalla: invisible solo si el script ya tomó el control (y nunca al imprimir). */
+@media screen {
+  html.motion :is(.reveal-apply, .reveal-stamp):not([data-seen]) { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-apply[data-seen] { animation: label-apply 760ms var(--ease-out) var(--delay, 0ms) backwards; }
+  .reveal-stamp[data-seen] { animation: stamp-thunk 540ms var(--ease-out) var(--delay, 120ms) backwards; }
+}
+/* Movimiento reducido: mismas apariciones, sin desplazamiento ni escala. */
+@media (prefers-reduced-motion: reduce) {
+  :is(.reveal-apply, .reveal-stamp)[data-seen] { animation: soft-fade 240ms ease-out backwards; }
+}
+
+/* Desplegables (preguntas, «Ver todo lo que incluye»): abren con altura real, no de golpe. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (interpolate-size: allow-keywords) and selector(::details-content) {
+    :root { interpolate-size: allow-keywords; }
+    details::details-content {
+      block-size: 0; overflow-y: clip;
+      transition: block-size 220ms var(--ease-out), content-visibility 220ms allow-discrete;
+    }
+    details[open]::details-content { block-size: auto; transition-duration: 360ms; }
+  }
+}
+
+/* Entre la portada y el pago: la etiqueta del plan viaja y se convierte en la guía de reserva. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+::view-transition-group(*) { animation-duration: 460ms; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+::view-transition-old(root) { animation: 180ms cubic-bezier(0.4, 0, 1, 1) both vt-out; }
+::view-transition-new(root) { animation: 320ms cubic-bezier(0.16, 1, 0.3, 1) 60ms both vt-in; }
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; } }

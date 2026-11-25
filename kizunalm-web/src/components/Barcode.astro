@@ -1,0 +1,26 @@
+---
+import { code128 } from '../lib/barcode';
+
+interface Props {
+  value: string;
+  /** Muestra el valor impreso bajo las barras, como en una etiqueta de despacho. */
+  caption?: boolean;
+  class?: string;
+}
+
+const { value, caption = true, class: className } = Astro.props;
+const { bars, totalWidth } = code128(value);
+---
+
+<figure class:list={['barcode', className]} aria-hidden="true">
+  <svg viewBox={`0 0 ${totalWidth} 40`} preserveAspectRatio="none" focusable="false">
+    {bars.map((bar) => <rect x={bar.x} y="0" width={bar.width} height="40" />)}
+  </svg>
+  {caption && <figcaption>{value}</figcaption>}
+</figure>
+
+<style>
+  .barcode { margin: 0; display: grid; gap: 4px; }
+  svg { display: block; width: 100%; height: var(--barcode-height, 56px); fill: var(--ink); shape-rendering: crispEdges; }
+  figcaption { font-family: var(--font-data); font-size: 12px; letter-spacing: 0.32em; text-align: center; color: var(--ink); }
+</style>

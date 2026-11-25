@@ -1,0 +1,219 @@
+---
+import Barcode from './Barcode.astro';
+import Tape from './Tape.astro';
+import WhatsAppIcon from './icons/WhatsAppIcon.astro';
+import { contact } from '../data/site';
+import { extras, maintenance, plans } from '../data/plans';
+import { depositFor, formatCLP } from '../lib/checkout';
+
+const singles = plans.filter((plan) => !plan.featured);
+const featured = plans.find((plan) => plan.featured);
+const askHref = (name: string) =>
+  `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(`Hola, tengo una pregunta sobre el plan ${name}. Mi negocio es: `)}`;
+---
+
+<section id="planes" class="plans page" aria-labelledby="plans-title">
+  <div class="section-head">
+    <h2 id="plans-title">Planes con precio final</h2>
+    <p>Eliges un plan, reservas con un abono del 50 % por Webpay y pagas el resto cuando te entrego todo. Sin mensualidad obligatoria.</p>
+  </div>
+
+  <div class="singles">
+    {
+      singles.map((plan, index) => (
+        <article id={`plan-${plan.id}`} class="label plan reveal-apply" data-inview style={`--scale:${index}; view-transition-name: plan-${plan.id}`} aria-labelledby={`t-${plan.id}`}>
+          <header class="plan-head">
+            <div class="label-field"><span>Formato</span><strong>{plan.format}</strong></div>
+            <span class="data code">KZ-{plan.code}</span>
+          </header>
+          <hr class="perforation" />
+          <div class="plan-main">
+            <div class="plan-summary">
+              <h3 id={`t-${plan.id}`}>{plan.name}</h3>
+              <p class="tagline">{plan.tagline}</p>
+              <p class="price data">{formatCLP(plan.price)}</p>
+              <p class="deposit">Abono para reservar: <strong class="data">{formatCLP(depositFor(plan))}</strong></p>
+              <dl class="facts">
+                <div><dt>Plazo</dt><dd>{plan.delivery}</dd></div>
+                <div><dt>Revisiones</dt><dd>{plan.revisions}</dd></div>
+              </dl>
+            </div>
+            <div class="plan-detail">
+            {/* Cada caja muestra un ítem más que la anterior; el resto queda a un clic. */}
+            <ul class="includes">{plan.includes.slice(0, 3 + index).map((item) => <li>{item}</li>)}</ul>
+            {plan.includes.length > 3 + index && (
+              <details class="more">
+                <summary>Ver todo lo que incluye ({plan.includes.length - 3 - index} más)</summary>
+                <ul class="includes">{plan.includes.slice(3 + index).map((item) => <li>{item}</li>)}</ul>
+              </details>
+            )}
+            <p class="excludes"><strong>No incluye:</strong> {plan.excludes.join(' · ')}</p>
+            <p class="ideal">{plan.idealFor}</p>
+            </div>
+          </div>
+          <div class="plan-actions">
+            <a class="btn btn-tape" href={`/pago/${plan.id}`}>Reservar con abono</a>
+            <a class="btn btn-ghost" href={askHref(plan.name)} target="_blank" rel="noopener noreferrer"><WhatsAppIcon />Preguntar</a>
+            <p class="note">{plan.priceNote}</p>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+
+  {
+    featured && (
+      <article id={`plan-${featured.id}`} class="label plan featured reveal-apply" data-inview style={`view-transition-name: plan-${featured.id}`} aria-labelledby={`t-${featured.id}`}>
+        <Tape class="featured-tape" text="EL MÁS COMPLETO · WEB + PUBLICACIONES + WHATSAPP ·" />
+        <header class="plan-head featured-head">
+          <div class="label-field"><span>Formato</span><strong>{featured.format}</strong></div>
+          <span class="data code">KZ-{featured.code}</span>
+        </header>
+        <hr class="perforation" />
+        <div class="featured-grid">
+          <div class="featured-left">
+            <h3 id={`t-${featured.id}`}>{featured.name}</h3>
+            <p class="tagline">{featured.tagline}</p>
+            <p class="price data">{formatCLP(featured.price)}</p>
+            <p class="deposit">Abono para reservar: <strong class="data">{formatCLP(depositFor(featured))}</strong></p>
+            <p class="note">{featured.priceNote}</p>
+            <div class="plan-actions inline">
+              <a class="btn btn-tape" href={`/pago/${featured.id}`}>Reservar con abono</a>
+              <a class="btn btn-ghost" href={askHref(featured.name)} target="_blank" rel="noopener noreferrer"><WhatsAppIcon />Preguntar</a>
+            </div>
+          </div>
+          <div class="featured-right">
+            <dl class="facts">
+              <div><dt>Plazo</dt><dd>{featured.delivery}</dd></div>
+              <div><dt>Revisiones</dt><dd>{featured.revisions}</dd></div>
+            </dl>
+            <ul class="includes">{featured.includes.map((item) => <li>{item}</li>)}</ul>
+            <p class="excludes"><strong>No incluye:</strong> {featured.excludes.join(' · ')}</p>
+            <Barcode value={`KZ-${featured.code}-${featured.price}`} class="featured-code" />
+          </div>
+        </div>
+      </article>
+    )
+  }
+
+  <div class="addons">
+    <div class="addon-group">
+      <h3>Mantención mensual <span>opcional, sin permanencia</span></h3>
+      <ul>
+        {maintenance.map((item) => (
+          <li class="label ticket">
+            <div><strong>{item.name}</strong><p>{item.includes}</p></div>
+            <p class="data ticket-price">{formatCLP(item.price)}<small>/mes</small></p>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div class="addon-group">
+      <h3>Extras <span>para sumar a cualquier plan</span></h3>
+      <ul>
+        {extras.map((item) => (
+          <li class="label ticket">
+            <div><strong>{item.name}</strong><p>{item.detail}</p></div>
+            <p class="data ticket-price">{formatCLP(item.price)}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .plans { padding-block: clamp(56px, 8vw, 112px); }
+
+  /* Sobre, paquete y caja: tres formatos de distinto tamaño, apoyados en la misma base. */
+  .singles { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 1.16fr); gap: clamp(16px, 2vw, 24px); align-items: start; }
+  .more summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: underline; text-decoration-color: var(--tape); text-underline-offset: 0.25em; list-style: none; }
+  .more summary::-webkit-details-marker { display: none; }
+  .more[open] summary { margin-bottom: 4px; }
+  .plan { display: flex; flex-direction: column; overflow: hidden; transition: transform 320ms var(--ease-out), box-shadow 320ms var(--ease-out); scroll-margin-top: calc(var(--nav-height) + 16px); }
+  .singles .plan:nth-child(1) { transform: rotate(-0.8deg); }
+  .singles .plan:nth-child(2) { transform: rotate(0.5deg); }
+  .singles .plan:nth-child(3) { transform: rotate(-0.4deg); }
+  .plan:hover, .plan:focus-within { transform: rotate(0) translateY(-4px); box-shadow: var(--shadow-label-lift); }
+  .plan:target { outline: 3px solid var(--tape); outline-offset: 4px; }
+
+  .plan-head { display: flex; justify-content: space-between; align-items: start; padding: 16px 22px; }
+  .plan-head strong { font-size: 15px; }
+  .code { font-size: 12px; letter-spacing: 0.14em; color: var(--ink-2); }
+  .plan-main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 20px 22px; align-content: start; }
+  .plan-summary, .plan-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-content: start; }
+  /* El tamaño de la caja es el tamaño del tipo: cada plan sube un escalón,
+     con techo en pantallas angostas para que el nombre y el precio nunca se corten. */
+  h3 { font-size: min(calc(28px + var(--scale, 0) * 8px), 10vw); color: var(--ink); }
+  .tagline { color: var(--ink-2); font-size: 16px; }
+  .price { font-size: min(calc(34px + var(--scale, 0) * 10px), 12.5vw); font-weight: 700; line-height: 1; letter-spacing: -0.04em; margin-top: 6px; }
+  .deposit { font-size: 14px; color: var(--ink-2); }
+  .deposit strong { color: var(--ink); }
+  .facts { margin: 4px 0 0; display: grid; gap: 6px; padding: 12px 0; border-block: 2px dashed var(--rule); }
+  .facts div { display: grid; grid-template-columns: 92px 1fr; gap: 8px; font-size: 14px; }
+  .facts dt { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; color: var(--ink-2); padding-top: 2px; }
+  .facts dd { margin: 0; font-weight: 600; }
+  .includes { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 15px; }
+  .includes li { display: grid; grid-template-columns: 16px 1fr; gap: 8px; }
+  .includes li::before { content: ""; width: 12px; height: 12px; margin-top: 4px; border: 2px solid var(--ink); border-radius: 2px;
+    background: linear-gradient(var(--ink), var(--ink)) center / 6px 6px no-repeat; }
+  .excludes { font-size: 14px; color: var(--ink-2); }
+  .ideal { font-size: 15px; font-weight: 600; font-style: italic; color: var(--ink); }
+  .plan-actions { display: grid; gap: 10px; padding: 0 22px 24px; margin-top: auto; }
+  .plan-actions .btn { width: 100%; }
+  .note { font-size: 13px; color: var(--ink-2); }
+
+  .featured { margin-top: clamp(40px, 5vw, 64px); position: relative; overflow: hidden; }
+  .featured :global(.featured-tape) { top: 0; left: -2%; right: -2%; height: 44px; }
+  .featured-head { padding: 64px clamp(22px, 4vw, 56px) 16px; }
+  .featured-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(20px, 4vw, 56px); padding: 28px clamp(22px, 4vw, 56px) clamp(28px, 4vw, 48px); }
+  .featured-left { display: grid; gap: 14px; align-content: start; }
+  .featured h3 { font-size: clamp(40px, 6vw, 84px); }
+  .featured .price { font-size: clamp(38px, 6vw, 80px); }
+  .featured-right { display: grid; gap: 16px; align-content: start; }
+  .featured-right .includes { font-size: 16px; }
+  .plan-actions.inline { display: flex; flex-wrap: wrap; padding: 0; margin-top: 8px; }
+  .plan-actions.inline .btn { width: auto; }
+  .featured :global(.featured-code) { --barcode-height: 52px; max-width: 360px; }
+
+  .addons { margin-top: clamp(40px, 5vw, 64px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(20px, 3vw, 40px); }
+  .addon-group h3 { font-size: clamp(28px, 3vw, 38px); margin-bottom: 16px; }
+  .addon-group h3 span { display: block; margin-top: 6px; font-size: 15px; font-weight: 600; font-variation-settings: "wdth" 100; color: var(--kraft-ink); }
+  .addon-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .ticket { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 16px 20px; }
+  .ticket strong { font-size: 18px; }
+  .ticket p { font-size: 14px; color: var(--ink-2); }
+  .ticket-price { font-size: 20px; font-weight: 700; color: var(--ink) !important; white-space: nowrap; }
+  .ticket-price small { font-size: 12px; font-weight: 500; color: var(--ink-2); }
+
+  /* Las tres etiquetas se pegan una tras otra; la caja grande queda sellada por su cinta. */
+  @media (min-width: 1101px) {
+    .singles .plan:nth-child(2) { --delay: 110ms; }
+    .singles .plan:nth-child(3) { --delay: 220ms; }
+  }
+  :global(html.motion) .featured:not([data-seen]) :global(.featured-tape) { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
+  @media (prefers-reduced-motion: no-preference) {
+    .featured[data-seen] :global(.featured-tape) { animation: tape-unroll 900ms var(--ease-out) 300ms backwards; }
+  }
+
+  /* Bajo 1100px las tres cajas no caben lado a lado: se apilan. */
+  @media (max-width: 1100px) {
+    .singles { grid-template-columns: minmax(0, 1fr); }
+    .singles .plan:nth-child(n) { transform: none; margin-top: 0; }
+  }
+  /* Tablet: cada caja apilada se arma a lo ancho, precio y plazos a un lado y contenido al otro. */
+  @media (min-width: 700px) and (max-width: 1100px) {
+    .plan-main { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); column-gap: clamp(24px, 4vw, 48px); padding-inline: clamp(22px, 4vw, 40px); }
+    .plan-actions { display: flex; flex-wrap: wrap; align-items: center; padding-inline: clamp(22px, 4vw, 40px); }
+    .plan-actions .btn { width: auto; flex: 0 0 auto; }
+    .plan-actions .note { flex: 1 1 240px; }
+  }
+  @media (max-width: 1020px) {
+    .featured-grid { grid-template-columns: minmax(0, 1fr); }
+    .addons { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .plan-actions.inline .btn { width: 100%; }
+    .ticket { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  }
+</style>

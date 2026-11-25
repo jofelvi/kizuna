@@ -1,0 +1,38 @@
+---
+/** Cinta de embalaje violeta con la marca impresa en repetición. Decorativa. */
+interface Props {
+  class?: string;
+  text?: string;
+}
+const { class: className, text = 'KIZUNALM · 絆 · DESPACHO CON CUIDADO ·' } = Astro.props;
+const run = Array.from({ length: 8 }, () => text).join(' ');
+---
+
+<div class:list={['tape', className]} aria-hidden="true"><span>{run}</span></div>
+
+<style>
+  .tape {
+    position: absolute;
+    height: 54px;
+    overflow: hidden;
+    display: flex; align-items: center;
+    color: var(--tape-ink);
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.22) 0 2px, transparent 2px calc(100% - 2px), rgb(0 0 0 / 0.18) calc(100% - 2px)),
+      linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.14) 45%, transparent 60%),
+      var(--tape);
+    box-shadow: 0 6px 14px -8px rgb(30 10 60 / 0.7);
+    clip-path: polygon(0.6% 0, 100% 0, 99.4% 100%, 0 100%);
+    pointer-events: none;
+  }
+  span {
+    white-space: nowrap;
+    font-family: var(--font-label);
+    font-weight: 800;
+    font-variation-settings: "wdth" 80;
+    font-size: 15px;
+    letter-spacing: 0.24em;
+    opacity: 0.92;
+    padding-left: 24px;
+  }
+</style>

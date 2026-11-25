@@ -1,0 +1,185 @@
+---
+import Brand from './Brand.astro';
+import { navLinks } from '../data/site';
+---
+
+<header class="nav">
+  <div class="page nav-row">
+    <Brand />
+    <nav class="desktop-nav" aria-label="Principal">
+      <ul class="menu">
+        {navLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+        <li class="indicator" aria-hidden="true"></li>
+      </ul>
+    </nav>
+    <a class="btn btn-tape nav-cta" href="/#planes">Ver planes</a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="l1" d="M4 7h16" /><path class="l2" d="M4 12h16" /><path class="l3" d="M4 17h16" /></svg>
+    </button>
+  </div>
+  <!-- En celular y tablet: el menú es una etiqueta que se despliega bajo la barra. -->
+  <nav id="mobile-menu" class="mobile-menu" aria-label="Menú" hidden>
+    <ul>
+      {navLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+    </ul>
+    <a class="btn btn-tape mobile-cta" href="/#planes">Ver planes y precios</a>
+  </nav>
+</header>
+
+<script>
+  // Menú de celular: abre y cierra el panel; se cierra al elegir, con Escape o tocando fuera.
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const panel = document.querySelector<HTMLElement>('#mobile-menu');
+  if (toggle && panel) {
+    const setOpen = (open: boolean, returnFocus = false) => {
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      if (!open && returnFocus) toggle.focus();
+    };
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+    panel.addEventListener('click', (event) => {
+      if (event.target instanceof Element && event.target.closest('a')) setOpen(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !panel.hidden) setOpen(false, true);
+    });
+    document.addEventListener('click', (event) => {
+      if (!panel.hidden && event.target instanceof Node && !panel.contains(event.target) && !toggle.contains(event.target)) setOpen(false);
+    });
+    // Si la pantalla crece hasta mostrar el menú normal, el panel no queda abierto por detrás.
+    matchMedia('(min-width: 901px)').addEventListener('change', (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+
+  // Indicador de sección: una franja de cinta bajo el enlace de la sección que se está leyendo.
+  // Solo actúa en la portada (donde existen las secciones); en el pago no hace nada.
+  const menu = document.querySelector<HTMLUListElement>('.nav .menu');
+  const indicator = menu?.querySelector<HTMLElement>('.indicator');
+  const links = [...(menu?.querySelectorAll<HTMLAnchorElement>('a[href*="#"]') ?? [])];
+  const pairs = links
+    .map((link) => ({ link, section: document.getElementById(new URL(link.href).hash.slice(1)) }))
+    .filter((pair): pair is { link: HTMLAnchorElement; section: HTMLElement } => pair.section !== null);
+
+  if (menu && indicator && pairs.length > 0) {
+    let active: HTMLAnchorElement | null = null;
+    const place = () => {
+      if (!active) {
+        menu.removeAttribute('data-has-active');
+        return;
+      }
+      menu.setAttribute('data-has-active', '');
+      indicator.style.setProperty('--x', `${active.offsetLeft + 12}px`);
+      indicator.style.setProperty('--w', String(active.offsetWidth - 24));
+    };
+    const visible = new Set<HTMLElement>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const section = entry.target as HTMLElement;
+          if (entry.isIntersecting) visible.add(section);
+          else visible.delete(section);
+        }
+        // La sección activa es la última (en orden de página) que cruza la franja de lectura.
+        const current = [...pairs].reverse().find((pair) => visible.has(pair.section));
+        links.forEach((link) => link.removeAttribute('data-active'));
+        active = current?.link ?? null;
+        active?.setAttribute('data-active', '');
+        // El menú de celular marca la misma sección.
+        document.querySelectorAll<HTMLAnchorElement>('.mobile-menu ul a').forEach((link) => {
+          link.toggleAttribute('data-active', link.getAttribute('href') === active?.getAttribute('href'));
+        });
+        place();
+      },
+      { rootMargin: '-40% 0px -55% 0px' },
+    );
+    pairs.forEach((pair) => observer.observe(pair.section));
+    new ResizeObserver(place).observe(menu);
+  }
+</script>
+
+<style>
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    color: var(--ink);
+    background: rgb(247 246 242 / 0.92);
+    backdrop-filter: saturate(1.2) blur(10px);
+    -webkit-backdrop-filter: saturate(1.2) blur(10px);
+    border-bottom: 2px dashed var(--rule);
+  }
+  .nav-row { display: flex; align-items: center; gap: 24px; min-height: var(--nav-height); }
+  .desktop-nav { margin-left: auto; }
+  .menu { position: relative; display: flex; gap: 4px; list-style: none; margin: 0; padding: 0; }
+  .menu a {
+    display: flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 4px;
+    font-weight: 600; font-size: 16px; text-decoration: none; color: var(--ink-2);
+    transition: color 160ms, background-color 160ms;
+  }
+  .menu a:hover, .menu a[data-active] { color: var(--ink); }
+  .menu a:hover { background: rgb(20 20 20 / 0.06); }
+  /* Franja de 1px escalada al ancho del enlace: se desliza con transform, sin recalcular layout. */
+  .indicator {
+    position: absolute; left: 0; bottom: -2px; width: 1px; height: 3px; border-radius: 2px;
+    background: var(--tape); transform-origin: left center; opacity: 0; pointer-events: none;
+    transform: translateX(var(--x, 0)) scaleX(var(--w, 0));
+    transition: opacity 200ms;
+  }
+  .menu[data-has-active] .indicator { opacity: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    .indicator { transition: transform 420ms var(--ease-out), opacity 200ms; }
+  }
+
+  /* Al dejar la parte de arriba, el menú pasa a flotar sobre el contenido: el filete se vuelve sombra. */
+  .nav { view-transition-name: site-nav; }
+  @supports (animation-timeline: scroll()) {
+    /* En longhands a propósito: el minificador fusiona «animation» + «animation-timeline» en un shorthand inválido. */
+    .nav { animation-name: nav-lift; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root); animation-range: 0 120px; }
+  }
+  @keyframes nav-lift { to { border-bottom-color: transparent; box-shadow: 0 12px 24px -18px rgb(58 36 14 / 0.65); } }
+  .nav-cta { min-height: 44px; padding: 0 18px; font-size: 16px; white-space: nowrap; }
+
+  .menu-toggle {
+    display: none; place-items: center; flex: none; width: 44px; height: 44px; padding: 0;
+    color: var(--ink); background: transparent; border: 2px solid var(--ink); border-radius: 4px; cursor: pointer;
+  }
+  .menu-toggle svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; overflow: visible; }
+  .menu-toggle path { transform-origin: 12px 12px; transition: transform 240ms var(--ease-out), opacity 160ms; }
+  .menu-toggle[aria-expanded="true"] { background: var(--ink); color: var(--label); }
+  .menu-toggle[aria-expanded="true"] .l1 { transform: translateY(5px) rotate(45deg); }
+  .menu-toggle[aria-expanded="true"] .l2 { opacity: 0; }
+  .menu-toggle[aria-expanded="true"] .l3 { transform: translateY(-5px) rotate(-45deg); }
+
+  .mobile-menu {
+    position: absolute; top: 100%; left: 0; right: 0;
+    max-height: calc(100dvh - var(--nav-height)); overflow-y: auto; overscroll-behavior: contain;
+    padding: 8px max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    background: var(--label); border-bottom: 2px dashed var(--rule);
+    box-shadow: 0 18px 30px -18px rgb(58 36 14 / 0.6);
+  }
+  .mobile-menu[hidden] { display: none; }
+  .mobile-menu ul { list-style: none; margin: 0 0 16px; padding: 0; }
+  .mobile-menu li + li { border-top: 2px dashed var(--rule); }
+  .mobile-menu ul a {
+    display: flex; align-items: center; min-height: 56px;
+    font-size: 24px; font-weight: 800; font-variation-settings: "wdth" 76; text-decoration: none; color: var(--ink);
+  }
+  .mobile-menu ul a[data-active] { text-decoration: underline; text-decoration-color: var(--tape); text-decoration-thickness: 3px; text-underline-offset: 0.22em; }
+  .mobile-cta { width: 100%; }
+  @media (prefers-reduced-motion: no-preference) {
+    .mobile-menu { transition: opacity 200ms, transform 260ms var(--ease-out); }
+    @starting-style { .mobile-menu { opacity: 0; transform: translateY(-8px); } }
+  }
+
+  @media (max-width: 900px) {
+    .desktop-nav { display: none; }
+    .nav-row { gap: 10px; }
+    .nav-cta { margin-left: auto; }
+    .menu-toggle { display: grid; }
+  }
+  /* En pantallas muy angostas el botón de planes vive dentro del menú. */
+  @media (max-width: 400px) {
+    .nav-cta { display: none; }
+    .menu-toggle { margin-left: auto; }
+  }
+</style>

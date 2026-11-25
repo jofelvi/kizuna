@@ -1,0 +1,55 @@
+---
+import { story, testimonials } from '../data/site';
+---
+
+<section id="nosotros" class="story page" aria-labelledby="story-title">
+  <div class="story-grid">
+    <div class="copy">
+      <h2 id="story-title">{story.title}</h2>
+      {story.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      <ul class="facts">{story.facts.map((fact) => <li>{fact}</li>)}</ul>
+    </div>
+    <aside class="label name-card" aria-labelledby="name-title">
+      <span class="stamp kanji reveal-stamp" aria-hidden="true" data-inview>絆</span>
+      <h3 id="name-title">{story.nameTitle}</h3>
+      <p>{story.nameText}</p>
+    </aside>
+  </div>
+
+  {
+    testimonials.length > 0 && (
+      <ul class="quotes" aria-label="Lo que dicen mis clientes">
+        {testimonials.map((item) => (
+          <li class="label quote">
+            <blockquote>«{item.quote}»</blockquote>
+            <p><strong>{item.name}</strong> · {item.business}</p>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</section>
+
+<style>
+  .story { padding-block: clamp(56px, 8vw, 112px); }
+  .story-grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
+  .copy { display: grid; gap: 18px; }
+  .copy h2 { font-size: clamp(44px, 6.4vw, 84px); color: var(--ink); margin-bottom: 6px; }
+  .copy p { font-size: clamp(17px, 1.5vw, 20px); max-width: 54ch; color: var(--kraft-ink); }
+  .facts { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .facts li { background: var(--ink); color: var(--label); padding: 6px 14px; border-radius: 3px; font-size: 14px; font-weight: 600; }
+
+  .name-card { padding: clamp(28px, 4vw, 48px); display: grid; gap: 14px; transform: rotate(1.4deg); }
+  .kanji { --delay: 220ms; width: 112px; height: 112px; font-family: var(--font-kanji); font-weight: 700; font-size: 76px; transform: rotate(-8deg); margin-bottom: 8px; }
+  .name-card h3 { font-size: 36px; }
+  .name-card p { color: var(--ink-2); font-size: 17px; }
+
+  .quotes { list-style: none; margin: 48px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  .quote { padding: 24px; display: grid; gap: 12px; }
+  .quote blockquote { margin: 0; font-size: 18px; font-weight: 500; }
+
+  @media (max-width: 900px) {
+    .story-grid { grid-template-columns: minmax(0, 1fr); }
+    .name-card { transform: none; }
+  }
+</style>

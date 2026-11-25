@@ -1,0 +1,16 @@
+# Dependencias y builds
+node_modules/
+dist/
+.astro/
+
+# Variables de entorno (credenciales de Webpay de producción)
+.env
+.env.*
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Impeccable: capturas de revisión (18 MB) y caché del detector
+kizunalm-web/.impeccable/review/
+kizunalm-web/.impeccable/hook.cache.json

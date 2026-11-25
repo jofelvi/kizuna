@@ -1,0 +1,21 @@
+---
+interface Props {
+  class?: string;
+  href?: string;
+}
+const { class: className, href = '/#inicio' } = Astro.props;
+---
+
+<a class:list={['brand', className]} href={href} aria-label="KIZUNALM, ir al inicio">
+  <span class="stamp mark" aria-hidden="true">絆</span>
+  <span class="word">KIZUNALM</span>
+</a>
+
+<style>
+  .brand { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; justify-self: start; text-decoration: none; color: inherit; }
+  .mark { width: 38px; height: 38px; font-family: var(--font-kanji); font-weight: 700; font-size: 26px; transform: rotate(-6deg); transition: transform 240ms var(--ease-out); }
+  /* El timbre se inclina como si fuera a estampar, y se hunde al presionar. */
+  .brand:hover .mark { transform: rotate(-12deg); }
+  .brand:active .mark { transform: rotate(-12deg) scale(0.9); transition-duration: 80ms; }
+  .word { font-weight: 800; font-variation-settings: "wdth" 70; font-size: 24px; letter-spacing: 0.06em; }
+</style>

@@ -1,0 +1,66 @@
+---
+import ArrowIcon from './icons/ArrowIcon.astro';
+import { services, servicesIntro } from '../data/site';
+---
+
+<section id="servicios" class="services page">
+  <div class="section-head">
+    <h2>{servicesIntro.title}</h2>
+    <p>{servicesIntro.lead}</p>
+  </div>
+
+  <ol class="label manifest" aria-label="Servicios">
+    {
+      services.map((service) => (
+        <li class="row">
+          <h3 class="channel">{service.channel}</h3>
+          <div class="body">
+            <p class="title">{service.title}</p>
+            <p class="problem"><span>Hoy</span>{service.problem}</p>
+            <p class="solution"><span>Con KIZUNALM</span>{service.solution}</p>
+          </div>
+          <div class="out">
+            <ul>
+              {service.deliverables.map((item) => <li>{item}</li>)}
+            </ul>
+            <a class="see-plan" href={`#plan-${service.planId}`}>Ver plan y precio <span class="arrow"><ArrowIcon /></span></a>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+  <p class="joined">Los tres juntos son el plan <a href="#plan-kizuna-completo">Kizuna Completo</a>: la misma información, en el mismo tono, en cada canal.</p>
+</section>
+
+<style>
+  .services { padding-block: clamp(72px, 10vw, 140px) clamp(40px, 6vw, 80px); }
+  .manifest { list-style: none; margin: 0; padding: 0; overflow: hidden; }
+  .row {
+    display: grid; grid-template-columns: minmax(0, 3.4fr) minmax(0, 5fr) minmax(0, 3fr);
+    gap: clamp(16px, 3vw, 40px); padding: clamp(24px, 3.4vw, 44px) clamp(20px, 3.4vw, 44px);
+    transition: background-color 240ms var(--ease-out);
+  }
+  .row + .row { border-top: 2px dashed var(--rule); }
+  .row:hover { background: var(--label-hover); }
+  .channel { font-size: clamp(38px, 4.2vw, 58px); color: var(--ink); }
+  .body { display: grid; gap: 12px; align-content: start; }
+  .title { font-weight: 700; font-size: 19px; }
+  .problem, .solution { display: grid; gap: 2px; font-size: 16px; }
+  .problem { color: var(--ink-2); }
+  .problem span, .solution span { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+  .solution span { color: var(--tape); }
+  .out { display: grid; gap: 10px; align-content: start; }
+  .out ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 15px; font-weight: 600; }
+  .out li { display: grid; grid-template-columns: 16px 1fr; gap: 8px; }
+  .out li::before { content: ""; width: 12px; height: 12px; margin-top: 4px; border: 2px solid var(--ink); border-radius: 2px;
+    background: linear-gradient(var(--tape), var(--tape)) center / 6px 6px no-repeat; }
+  .see-plan { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; justify-self: start; font-weight: 700; color: var(--ink); text-decoration-color: var(--tape); }
+  .see-plan .arrow { display: inline-block; transition: transform 200ms var(--ease-out); }
+  .see-plan:hover .arrow { transform: translateX(4px); }
+  .joined { margin-top: 24px; font-size: 18px; font-weight: 600; color: var(--ink); max-width: 60ch; }
+  .joined a { text-decoration-color: var(--tape); text-decoration-thickness: 3px; }
+
+  @media (max-width: 900px) {
+    .row { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

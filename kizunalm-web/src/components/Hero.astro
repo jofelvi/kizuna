@@ -1,0 +1,123 @@
+---
+import Barcode from './Barcode.astro';
+import Tape from './Tape.astro';
+import WhatsAppIcon from './icons/WhatsAppIcon.astro';
+import { contact, hero } from '../data/site';
+
+const whatsappHref = `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(hero.whatsappMessage)}`;
+---
+
+<section id="inicio" class="hero">
+  <Tape class="hero-tape" />
+  <div class="page hero-grid">
+    <article class="label ship" aria-labelledby="hero-title">
+      <header class="ship-head">
+        <div class="label-field">
+          <span>Remitente</span>
+          <strong>KIZUNALM · {contact.location}</strong>
+        </div>
+        <div class="label-field">
+          <span>Destinatario</span>
+          <strong>{hero.recipient}</strong>
+        </div>
+        <div class="label-field service">
+          <span>Servicio</span>
+          <strong class="data">PYME · 絆</strong>
+        </div>
+      </header>
+      <hr class="perforation" />
+      <div class="ship-body">
+        <h1 id="hero-title">{hero.title}</h1>
+        <p class="lead">{hero.lead}</p>
+        <div class="actions">
+          <a class="btn btn-tape" href="#planes">{hero.primaryCta}</a>
+          <a class="btn btn-ghost" href={whatsappHref} target="_blank" rel="noopener noreferrer">
+            <WhatsAppIcon />{hero.secondaryCta}
+          </a>
+        </div>
+      </div>
+      <hr class="perforation" />
+      <footer class="ship-foot">
+        <ul class="manifest">
+          {hero.promises.map((promise, index) => <li style={`--i:${index}`}>{promise}</li>)}
+        </ul>
+        <Barcode value="KZ-0001-CL" class="ship-code" />
+      </footer>
+    </article>
+
+    <div class="seal">
+      <span class="stamp seal-mark" aria-hidden="true">絆</span>
+      <p class="seal-note">{hero.sealNote}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero { position: relative; padding-block: clamp(84px, 7vw, 104px) clamp(64px, 9vw, 120px); overflow: hidden; }
+  .hero :global(.hero-tape) { left: -4%; right: -4%; top: clamp(22px, 3.4vw, 40px); transform: rotate(-2.2deg); transform-origin: left center; }
+
+  .hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 7.2fr) minmax(0, 4fr); gap: clamp(28px, 4vw, 64px); align-items: center; }
+
+  .ship { transform: rotate(-1.2deg); padding: 0; overflow: hidden; }
+  .ship-head, .ship-body, .ship-foot { padding: clamp(16px, 2vw, 24px) clamp(20px, 3vw, 40px); }
+  .ship-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .ship-head strong { font-size: 15px; font-weight: 700; }
+  .service { text-align: right; margin-left: auto; }
+  .ship-body { display: grid; gap: clamp(12px, 1.4vw, 18px); }
+  .ship-body .label-field strong { font-size: 17px; font-weight: 600; }
+  h1 { font-size: clamp(42px, 5vw, 76px); color: var(--ink); max-width: 15ch; }
+  .lead { font-size: clamp(17px, 1.5vw, 20px); color: var(--ink-2); max-width: 52ch; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
+
+  .ship-foot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 220px); gap: 20px; align-items: end; }
+  .manifest { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 15px; font-weight: 600; }
+  .manifest li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: baseline; }
+  .manifest li::before { content: ""; width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 2px; transform: translateY(1px);
+    background: linear-gradient(var(--ink), var(--ink)) center / 6px 6px no-repeat; }
+  .ship-foot :global(.ship-code) { --barcode-height: 64px; }
+
+  .seal { display: grid; justify-items: center; gap: 18px; text-align: center; }
+  .seal-mark { width: clamp(150px, 19vw, 240px); height: clamp(150px, 19vw, 240px); font-family: var(--font-kanji); font-weight: 700; font-size: clamp(104px, 13vw, 168px); transform: rotate(-8deg); }
+  .seal-note { max-width: 24ch; font-size: 15px; font-weight: 600; color: var(--kraft-ink); }
+
+  /* Láser del escáner: una franja del ancho del código cuyo borde derecho es la línea violeta. */
+  .ship-foot :global(.ship-code) { position: relative; }
+  .ship-foot :global(.ship-code)::after {
+    content: ""; position: absolute; inset: -6px 0 18px; opacity: 0; pointer-events: none;
+    background: linear-gradient(90deg, transparent calc(100% - 36px), rgb(91 45 190 / 0.16) calc(100% - 2px), var(--tape) calc(100% - 2px));
+  }
+
+  /* Momento firma, una vez al cargar (≈2 s): la etiqueta se apoya, la cinta se desenrolla,
+     cae el timbre, la impresora térmica imprime el código, el escáner lo lee y se marcan
+     las casillas del manifiesto. El título se lee desde el primer cuadro. */
+  @media (prefers-reduced-motion: no-preference) {
+    .ship { animation: settle 900ms var(--ease-out) both; }
+    .hero :global(.hero-tape) { animation: tape-unroll 1100ms var(--ease-out) 120ms backwards; }
+    .seal-mark { animation: stamp-thunk 520ms var(--ease-out) 900ms backwards; }
+    .ship-foot :global(.ship-code svg) { animation: print-bars 640ms steps(16, end) 700ms backwards; }
+    .ship-foot :global(.ship-code)::after { animation: scan 820ms cubic-bezier(0.45, 0, 0.55, 1) 1380ms; }
+    .manifest li::before { animation: tick 260ms var(--ease-out) calc(1600ms + var(--i) * 140ms) backwards; }
+  }
+  @keyframes settle { from { opacity: 0.001; transform: rotate(-3deg) translateY(18px); } to { opacity: 1; transform: rotate(-1.2deg) translateY(0); } }
+  @keyframes print-bars { from { clip-path: inset(0 0 100% 0); } }
+  @keyframes scan {
+    0% { opacity: 0; transform: translateX(-100%); }
+    12%, 88% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(0); }
+  }
+  @keyframes tick { from { background-size: 0 0; } }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: minmax(0, 1fr); }
+    .seal { order: -1; grid-template-columns: auto 1fr; justify-items: start; text-align: left; align-items: center; }
+    .seal-mark { width: 92px; height: 92px; font-size: 62px; }
+    .ship { transform: rotate(-0.6deg); }
+    @keyframes settle { from { opacity: 0.001; transform: translateY(14px); } to { opacity: 1; transform: rotate(-0.6deg); } }
+  }
+  @media (max-width: 560px) {
+    .ship-foot { grid-template-columns: minmax(0, 1fr); }
+    /* Botones a todo el ancho: blancos grandes para el pulgar. */
+    .actions .btn { flex: 1 1 100%; }
+    .ship-head strong { font-size: 13px; }
+  }
+</style>
